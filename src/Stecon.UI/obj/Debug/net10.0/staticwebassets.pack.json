@@ -1,0 +1,45 @@
+{
+  "Files": [
+    {
+      "Id": "C:\\Users\\Natcha\\SteconDesignSystem\\src\\Stecon.UI\\obj\\Debug\\net10.0\\scopedcss\\projectbundle\\Stecon.UI.bundle.scp.css",
+      "PackagePath": "staticwebassets\\Stecon.UI.n1gzifxke1.bundle.scp.css"
+    },
+    {
+      "Id": "C:\\Users\\Natcha\\SteconDesignSystem\\src\\Stecon.UI\\wwwroot\\background.png",
+      "PackagePath": "staticwebassets\\background.png"
+    },
+    {
+      "Id": "C:\\Users\\Natcha\\SteconDesignSystem\\src\\Stecon.UI\\wwwroot\\brand\\README.md",
+      "PackagePath": "staticwebassets\\brand\\README.md"
+    },
+    {
+      "Id": "C:\\Users\\Natcha\\SteconDesignSystem\\src\\Stecon.UI\\wwwroot\\brand\\stecon-logo.jpg",
+      "PackagePath": "staticwebassets\\brand\\stecon-logo.jpg"
+    },
+    {
+      "Id": "C:\\Users\\Natcha\\SteconDesignSystem\\src\\Stecon.UI\\wwwroot\\exampleJsInterop.js",
+      "PackagePath": "staticwebassets\\exampleJsInterop.js"
+    },
+    {
+      "Id": "obj\\Debug\\net10.0\\staticwebassets\\msbuild.Stecon.UI.Microsoft.AspNetCore.StaticWebAssetEndpoints.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssetEndpoints.props"
+    },
+    {
+      "Id": "obj\\Debug\\net10.0\\staticwebassets\\msbuild.Stecon.UI.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net10.0\\staticwebassets\\msbuild.build.Stecon.UI.props",
+      "PackagePath": "build\\Stecon.UI.props"
+    },
+    {
+      "Id": "obj\\Debug\\net10.0\\staticwebassets\\msbuild.buildMultiTargeting.Stecon.UI.props",
+      "PackagePath": "buildMultiTargeting\\Stecon.UI.props"
+    },
+    {
+      "Id": "obj\\Debug\\net10.0\\staticwebassets\\msbuild.buildTransitive.Stecon.UI.props",
+      "PackagePath": "buildTransitive\\Stecon.UI.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

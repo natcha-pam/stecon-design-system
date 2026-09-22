@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Stecon.UI.Demo/Stecon.UI.Demo.csproj" />
+    <Project Path="src/Stecon.UI/Stecon.UI.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Stecon.UI.Tests/Stecon.UI.Tests.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "slCv6QEVG/A=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Natcha\\SteconDesignSystem\\src\\Stecon.UI.Demo\\Stecon.UI.Demo.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Natcha\\.nuget\\packages\\microsoft.aspnetcore.app.internal.assets\\10.0.11\\microsoft.aspnetcore.app.internal.assets.10.0.11.nupkg.sha512"
+  ],
+  "logs": []
+}
