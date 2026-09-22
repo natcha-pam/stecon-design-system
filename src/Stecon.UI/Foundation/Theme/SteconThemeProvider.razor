@@ -1,0 +1,32 @@
+@namespace Stecon.UI
+@implements IDisposable
+@inject IThemeService ThemeService
+
+<div class="stecon-theme-root" data-theme="@ThemeAttribute">
+    @ChildContent
+</div>
+
+@code {
+    /// <summary>
+    /// Theme applied the first time this provider initializes. To change the
+    /// theme afterward, use <see cref="IThemeService.SetTheme"/> rather than
+    /// setting this parameter again.
+    /// </summary>
+    [Parameter]
+    public ThemeMode InitialTheme { get; set; } = ThemeMode.Light;
+
+    [Parameter, EditorRequired]
+    public RenderFragment? ChildContent { get; set; }
+
+    private string ThemeAttribute => ThemeService.Current == ThemeMode.Dark ? "dark" : "light";
+
+    protected override void OnInitialized()
+    {
+        ThemeService.SetTheme(InitialTheme);
+        ThemeService.ThemeChanged += OnThemeChanged;
+    }
+
+    private void OnThemeChanged(ThemeMode mode) => InvokeAsync(StateHasChanged);
+
+    public void Dispose() => ThemeService.ThemeChanged -= OnThemeChanged;
+}

@@ -1,0 +1,23 @@
+/*
+  Motion tokens (STECON UI Foundation v1)
+  Source: docs/02-DESIGN-TOKENS.md
+  The prefers-reduced-motion override implements the requirement in
+  docs/06-ACCESSIBILITY.md.
+*/
+:root {
+  --stecon-duration-fast: 120ms;
+  --stecon-duration-normal: 200ms;
+  --stecon-duration-slow: 300ms;
+
+  --stecon-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --stecon-ease-enter: cubic-bezier(0, 0, 0.2, 1);
+  --stecon-ease-exit: cubic-bezier(0.4, 0, 1, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --stecon-duration-fast: 0ms;
+    --stecon-duration-normal: 0ms;
+    --stecon-duration-slow: 0ms;
+  }
+}

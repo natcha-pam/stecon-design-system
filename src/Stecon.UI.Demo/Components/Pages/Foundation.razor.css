@@ -1,0 +1,43 @@
+.stecon-gallery-section {
+    margin-bottom: var(--stecon-space-8);
+}
+
+.stecon-swatch-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--stecon-space-4);
+}
+
+.stecon-swatch {
+    width: 9rem;
+    height: 4.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border: 1px solid var(--stecon-border-default);
+    border-radius: var(--stecon-radius-md);
+    font-size: var(--stecon-font-size-xs);
+}
+
+.stecon-spacing-row {
+    display: flex;
+    align-items: center;
+    gap: var(--stecon-space-4);
+}
+
+.stecon-spacing-box {
+    height: 1.5rem;
+    background-color: var(--stecon-status-info);
+}
+
+.stecon-radius-box,
+.stecon-shadow-box {
+    width: 5rem;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--stecon-surface-card);
+    border: 1px solid var(--stecon-border-default);
+}

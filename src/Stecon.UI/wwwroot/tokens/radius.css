@@ -1,0 +1,9 @@
+/*
+  Radius tokens (STECON UI Foundation)
+  Source: docs/02-DESIGN-TOKENS.md - do not add steps beyond what is documented.
+*/
+:root {
+  --stecon-radius-sm: 0.375rem;
+  --stecon-radius-md: 0.625rem;
+  --stecon-radius-lg: 0.875rem;
+}

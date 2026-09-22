@@ -1,0 +1,25 @@
+/*
+  Dark theme (STECON UI Foundation)
+  Redefines the same semantic tokens declared in themes/light.css - see
+  docs/08-THEME-SPEC.md. Applied whenever SteconThemeProvider sets
+  data-theme="dark".
+*/
+[data-theme='dark'] {
+  --stecon-surface-page: #12151c;
+  --stecon-surface-card: #1b1f29;
+
+  --stecon-text-primary: #e7eaf0;
+  --stecon-text-secondary: #a3aab8;
+
+  --stecon-border-default: #2c313d;
+
+  /* Semantic status - provisional, intentionally independent of brand tokens */
+  --stecon-status-success: #3fb96a;
+  --stecon-status-success-surface: #163524;
+  --stecon-status-warning: #e0982f;
+  --stecon-status-warning-surface: #3a2a10;
+  --stecon-status-danger: #e2564f;
+  --stecon-status-danger-surface: #3a1918;
+  --stecon-status-info: #4c9be0;
+  --stecon-status-info-surface: #132a3a;
+}

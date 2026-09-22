@@ -1,0 +1,25 @@
+/*
+  Light theme (STECON UI Foundation)
+  Redefines semantic tokens only - see docs/08-THEME-SPEC.md.
+  Applied by default and whenever SteconThemeProvider sets data-theme="light".
+*/
+:root,
+[data-theme='light'] {
+  --stecon-surface-page: #f6f7f9;
+  --stecon-surface-card: #ffffff;
+
+  --stecon-text-primary: #172033;
+  --stecon-text-secondary: #667085;
+
+  --stecon-border-default: #dfe3e8;
+
+  /* Semantic status - provisional, intentionally independent of brand tokens */
+  --stecon-status-success: #1a7f37;
+  --stecon-status-success-surface: #e6f4ea;
+  --stecon-status-warning: #b25e00;
+  --stecon-status-warning-surface: #fdf1e0;
+  --stecon-status-danger: #c4221f;
+  --stecon-status-danger-surface: #fbe9e8;
+  --stecon-status-info: #0f5fa8;
+  --stecon-status-info-surface: #e6f0fa;
+}

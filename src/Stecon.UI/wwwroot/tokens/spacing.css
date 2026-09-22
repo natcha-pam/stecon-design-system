@@ -1,0 +1,12 @@
+/*
+  Spacing tokens (STECON UI Foundation)
+  Source: docs/02-DESIGN-TOKENS.md - do not add steps beyond what is documented.
+*/
+:root {
+  --stecon-space-1: 0.25rem;
+  --stecon-space-2: 0.5rem;
+  --stecon-space-3: 0.75rem;
+  --stecon-space-4: 1rem;
+  --stecon-space-6: 1.5rem;
+  --stecon-space-8: 2rem;
+}

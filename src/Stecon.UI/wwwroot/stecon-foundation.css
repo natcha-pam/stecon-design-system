@@ -1,0 +1,15 @@
+/*
+  STECON UI Foundation - single entry point.
+  Consuming applications should link only this file:
+    _content/Stecon.UI/stecon-foundation.css
+*/
+@import 'tokens/colors.css';
+@import 'tokens/typography.css';
+@import 'tokens/spacing.css';
+@import 'tokens/radius.css';
+@import 'tokens/shadows.css';
+@import 'tokens/breakpoints.css';
+@import 'tokens/motion.css';
+@import 'tokens/z-index.css';
+@import 'themes/light.css';
+@import 'themes/dark.css';

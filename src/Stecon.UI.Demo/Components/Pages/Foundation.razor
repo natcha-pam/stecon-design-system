@@ -1,0 +1,101 @@
+@page "/foundation"
+@inject IThemeService ThemeService
+@implements IDisposable
+
+<PageTitle>Foundation &amp; Theme</PageTitle>
+
+<h1>Foundation &amp; Theme</h1>
+<p>Preview of the STECON UI Foundation tokens and theme architecture (M1A).</p>
+
+<section class="stecon-gallery-section">
+    <h2>Theme</h2>
+    <p>Current theme: <strong>@ThemeService.Current</strong></p>
+    <button class="btn btn-primary" @onclick="ToggleTheme">Toggle Light / Dark</button>
+</section>
+
+<section class="stecon-gallery-section">
+    <h2>Semantic colors</h2>
+    <div class="stecon-swatch-grid">
+        <div class="stecon-swatch" style="background:var(--stecon-surface-page);color:var(--stecon-text-primary)">surface-page</div>
+        <div class="stecon-swatch" style="background:var(--stecon-surface-card);color:var(--stecon-text-primary)">surface-card</div>
+        <div class="stecon-swatch" style="background:var(--stecon-status-success-surface);color:var(--stecon-status-success)">status-success</div>
+        <div class="stecon-swatch" style="background:var(--stecon-status-warning-surface);color:var(--stecon-status-warning)">status-warning</div>
+        <div class="stecon-swatch" style="background:var(--stecon-status-danger-surface);color:var(--stecon-status-danger)">status-danger</div>
+        <div class="stecon-swatch" style="background:var(--stecon-status-info-surface);color:var(--stecon-status-info)">status-info</div>
+    </div>
+</section>
+
+<section class="stecon-gallery-section">
+    <h2>Typography</h2>
+    <p style="font-size:var(--stecon-font-size-xs)">xs — The quick brown fox jumps over the lazy dog</p>
+    <p style="font-size:var(--stecon-font-size-sm)">sm — The quick brown fox jumps over the lazy dog</p>
+    <p style="font-size:var(--stecon-font-size-md)">md — The quick brown fox jumps over the lazy dog</p>
+    <p style="font-size:var(--stecon-font-size-lg)">lg — The quick brown fox jumps over the lazy dog</p>
+    <p style="font-size:var(--stecon-font-size-xl)">xl — The quick brown fox jumps over the lazy dog</p>
+    <p style="font-size:var(--stecon-font-size-2xl)">2xl — The quick brown fox jumps over the lazy dog</p>
+    <p style="font-size:var(--stecon-font-size-3xl);font-weight:var(--stecon-font-weight-bold)">3xl bold — The quick brown fox jumps over the lazy dog</p>
+</section>
+
+<section class="stecon-gallery-section">
+    <h2>Spacing</h2>
+    <div class="stecon-spacing-row">
+        <div class="stecon-spacing-box" style="width:var(--stecon-space-1)"></div>
+        <div class="stecon-spacing-box" style="width:var(--stecon-space-2)"></div>
+        <div class="stecon-spacing-box" style="width:var(--stecon-space-3)"></div>
+        <div class="stecon-spacing-box" style="width:var(--stecon-space-4)"></div>
+        <div class="stecon-spacing-box" style="width:var(--stecon-space-6)"></div>
+        <div class="stecon-spacing-box" style="width:var(--stecon-space-8)"></div>
+    </div>
+</section>
+
+<section class="stecon-gallery-section">
+    <h2>Radius</h2>
+    <div class="stecon-spacing-row">
+        <div class="stecon-radius-box" style="border-radius:var(--stecon-radius-sm)">sm</div>
+        <div class="stecon-radius-box" style="border-radius:var(--stecon-radius-md)">md</div>
+        <div class="stecon-radius-box" style="border-radius:var(--stecon-radius-lg)">lg</div>
+    </div>
+</section>
+
+<section class="stecon-gallery-section">
+    <h2>Shadow</h2>
+    <div class="stecon-spacing-row">
+        <div class="stecon-shadow-box" style="box-shadow:var(--stecon-shadow-sm)">sm</div>
+        <div class="stecon-shadow-box" style="box-shadow:var(--stecon-shadow-md)">md</div>
+        <div class="stecon-shadow-box" style="box-shadow:var(--stecon-shadow-lg)">lg</div>
+    </div>
+</section>
+
+<section class="stecon-gallery-section">
+    <h2>Breakpoints</h2>
+    <ul>
+        <li>mobile: var(--stecon-breakpoint-mobile) (375px)</li>
+        <li>tablet: var(--stecon-breakpoint-tablet) (768px)</li>
+        <li>desktop: var(--stecon-breakpoint-desktop) (1440px)</li>
+    </ul>
+</section>
+
+<section class="stecon-gallery-section">
+    <h2>Motion &amp; Z-index</h2>
+    <ul>
+        <li>duration-fast / normal / slow</li>
+        <li>ease-standard, ease-enter, ease-exit</li>
+        <li>z-base, z-sticky, z-sidebar, z-dropdown, z-drawer, z-modal, z-toast</li>
+    </ul>
+</section>
+
+@code {
+    protected override void OnInitialized()
+    {
+        ThemeService.ThemeChanged += OnThemeChanged;
+    }
+
+    private void ToggleTheme()
+    {
+        ThemeService.SetTheme(ThemeService.Current == ThemeMode.Light ? ThemeMode.Dark : ThemeMode.Light);
+    }
+
+    private void OnThemeChanged(ThemeMode mode) => InvokeAsync(StateHasChanged);
+
+    public void Dispose() => ThemeService.ThemeChanged -= OnThemeChanged;
+}

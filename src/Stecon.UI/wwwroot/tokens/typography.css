@@ -1,0 +1,26 @@
+/*
+  Typography tokens (STECON UI Foundation v1)
+  Source: docs/02-DESIGN-TOKENS.md
+*/
+:root {
+  --stecon-font-family:
+    'Noto Sans Thai', 'Noto Sans', system-ui, -apple-system,
+    BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  --stecon-font-size-xs: 0.75rem;
+  --stecon-font-size-sm: 0.875rem;
+  --stecon-font-size-md: 1rem;
+  --stecon-font-size-lg: 1.125rem;
+  --stecon-font-size-xl: 1.25rem;
+  --stecon-font-size-2xl: 1.5rem;
+  --stecon-font-size-3xl: 1.875rem;
+
+  --stecon-font-weight-regular: 400;
+  --stecon-font-weight-medium: 500;
+  --stecon-font-weight-semibold: 600;
+  --stecon-font-weight-bold: 700;
+
+  --stecon-line-height-tight: 1.25;
+  --stecon-line-height-normal: 1.5;
+  --stecon-line-height-relaxed: 1.75;
+}

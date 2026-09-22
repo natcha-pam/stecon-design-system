@@ -1,0 +1,14 @@
+/*
+  Brand tokens (STECON UI Foundation)
+  Source: docs/02-DESIGN-TOKENS.md
+
+  Theme-invariant brand references only. Components must not consume
+  these directly - use the semantic tokens defined in themes/light.css
+  and themes/dark.css instead (see the Semantic rule in that doc).
+*/
+:root {
+  /* provisional - pending an official STECON brand guideline */
+  --stecon-brand-red: #ef1b24;
+  --stecon-brand-blue: #33489b;
+  --stecon-brand-white: #ffffff;
+}

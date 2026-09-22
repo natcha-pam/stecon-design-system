@@ -1,0 +1,15 @@
+/*
+  Z-index tokens (STECON UI Foundation v1)
+  Source: docs/02-DESIGN-TOKENS.md and docs/04-LAYOUT-RULES.md.
+  Components must consume these tokens; never declare arbitrary
+  stacking values.
+*/
+:root {
+  --stecon-z-base: 0;
+  --stecon-z-sticky: 100;
+  --stecon-z-sidebar: 200;
+  --stecon-z-dropdown: 300;
+  --stecon-z-drawer: 400;
+  --stecon-z-modal: 500;
+  --stecon-z-toast: 600;
+}

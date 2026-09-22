@@ -1,0 +1,13 @@
+/*
+  Breakpoint tokens (STECON UI Foundation)
+  Source: docs/05-RESPONSIVE-RULES.md required verification widths.
+
+  CSS custom properties cannot be read inside @media conditions. These
+  values are the single source of truth that any @media rule (in this
+  library or in consuming applications) must mirror.
+*/
+:root {
+  --stecon-breakpoint-mobile: 375px;
+  --stecon-breakpoint-tablet: 768px;
+  --stecon-breakpoint-desktop: 1440px;
+}
