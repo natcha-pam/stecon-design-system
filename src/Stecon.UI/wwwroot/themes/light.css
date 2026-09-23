@@ -20,6 +20,25 @@
   --stecon-status-warning-surface: #fdf1e0;
   --stecon-status-danger: #c4221f;
   --stecon-status-danger-surface: #fbe9e8;
+  /* Solid-fill-safe shade for Danger buttons only (on-interactive text needs
+     >=4.5:1). Equal to status-danger in light theme since that already
+     passes; kept as its own token so status-danger's text-on-surface usage
+     (Badge/FormField error text) is never affected by button contrast fixes. */
+  --stecon-status-danger-strong: #c4221f;
   --stecon-status-info: #0f5fa8;
   --stecon-status-info-surface: #e6f0fa;
+
+  /*
+    Interactive (M1C) - the semantic identity for primary actions/focus.
+    Deliberately independent from both brand-blue and status-info so
+    "primary action" keeps its own meaning (see docs/02-DESIGN-TOKENS.md
+    semantic rule). Values chosen for accessible contrast against
+    --stecon-on-interactive.
+  */
+  --stecon-interactive-default: #1d4ed8;
+  --stecon-interactive-hover: #1739ad;
+  --stecon-interactive-active: #142d85;
+  --stecon-interactive-disabled: #c3cdf0;
+  --stecon-on-interactive: #ffffff;
+  --stecon-focus-ring: #1d4ed8;
 }

@@ -1,0 +1,43 @@
+.stecon-form-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--stecon-space-1);
+    min-width: 0;
+}
+
+.stecon-form-field__label {
+    font-size: var(--stecon-font-size-sm);
+    font-weight: var(--stecon-font-weight-semibold);
+    color: var(--stecon-text-primary);
+}
+
+.stecon-form-field__required {
+    color: var(--stecon-status-danger);
+    margin-left: var(--stecon-space-1);
+}
+
+.stecon-form-field__helper {
+    margin: 0;
+    font-size: var(--stecon-font-size-sm);
+    color: var(--stecon-text-secondary);
+}
+
+.stecon-form-field__error {
+    margin: 0;
+    font-size: var(--stecon-font-size-sm);
+    color: var(--stecon-status-danger);
+}
+
+/* Local visually-hidden utility (not a public class) - keeps required-ness
+   accessible even when the consumer doesn't separately wire aria-required. */
+.stecon-visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}

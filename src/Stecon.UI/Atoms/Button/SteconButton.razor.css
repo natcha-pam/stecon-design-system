@@ -1,0 +1,165 @@
+.stecon-button {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--stecon-space-2);
+    min-width: 0;
+    border: 1px solid transparent;
+    border-radius: var(--stecon-radius-sm);
+    font-family: inherit;
+    font-weight: var(--stecon-font-weight-semibold);
+    line-height: var(--stecon-line-height-normal);
+    cursor: pointer;
+    transition: background-color var(--stecon-duration-fast) var(--stecon-ease-standard),
+                border-color var(--stecon-duration-fast) var(--stecon-ease-standard),
+                color var(--stecon-duration-fast) var(--stecon-ease-standard);
+}
+
+.stecon-button:disabled {
+    cursor: not-allowed;
+}
+
+.stecon-button:focus-visible {
+    outline: 2px solid var(--stecon-focus-ring);
+    outline-offset: 2px;
+}
+
+.stecon-button__label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.stecon-button__icon {
+    display: inline-flex;
+    flex-shrink: 0;
+    width: 1.1em;
+    height: 1.1em;
+    align-items: center;
+    justify-content: center;
+}
+
+.stecon-button--full-width {
+    display: flex;
+    width: 100%;
+}
+
+.stecon-button--sm {
+    padding: var(--stecon-space-1) var(--stecon-space-3);
+    font-size: var(--stecon-font-size-sm);
+}
+
+.stecon-button--md {
+    padding: var(--stecon-space-2) var(--stecon-space-4);
+    font-size: var(--stecon-font-size-md);
+}
+
+.stecon-button--lg {
+    padding: var(--stecon-space-3) var(--stecon-space-6);
+    font-size: var(--stecon-font-size-lg);
+}
+
+.stecon-button--primary {
+    background-color: var(--stecon-interactive-default);
+    border-color: var(--stecon-interactive-default);
+    color: var(--stecon-on-interactive);
+}
+
+.stecon-button--primary:hover:not(:disabled) {
+    background-color: var(--stecon-interactive-hover);
+    border-color: var(--stecon-interactive-hover);
+}
+
+.stecon-button--primary:active:not(:disabled) {
+    background-color: var(--stecon-interactive-active);
+    border-color: var(--stecon-interactive-active);
+}
+
+.stecon-button--primary:disabled {
+    background-color: var(--stecon-interactive-disabled);
+    border-color: var(--stecon-interactive-disabled);
+    color: var(--stecon-text-secondary);
+}
+
+.stecon-button--secondary {
+    background-color: var(--stecon-surface-page);
+    border-color: var(--stecon-border-default);
+    color: var(--stecon-text-primary);
+}
+
+.stecon-button--secondary:hover:not(:disabled) {
+    background-color: var(--stecon-border-default);
+}
+
+.stecon-button--secondary:disabled {
+    color: var(--stecon-text-secondary);
+}
+
+.stecon-button--outline {
+    background-color: transparent;
+    border-color: var(--stecon-interactive-default);
+    color: var(--stecon-interactive-default);
+}
+
+.stecon-button--outline:hover:not(:disabled) {
+    background-color: var(--stecon-interactive-disabled);
+}
+
+.stecon-button--outline:disabled {
+    border-color: var(--stecon-border-default);
+    color: var(--stecon-text-secondary);
+}
+
+.stecon-button--ghost {
+    background-color: transparent;
+    border-color: transparent;
+    color: var(--stecon-text-primary);
+}
+
+.stecon-button--ghost:hover:not(:disabled) {
+    background-color: var(--stecon-surface-page);
+}
+
+.stecon-button--ghost:disabled {
+    color: var(--stecon-text-secondary);
+}
+
+.stecon-button--danger {
+    background-color: var(--stecon-status-danger-strong);
+    border-color: var(--stecon-status-danger-strong);
+    color: var(--stecon-on-interactive);
+}
+
+.stecon-button--danger:hover:not(:disabled) {
+    filter: brightness(0.92);
+}
+
+.stecon-button--danger:disabled {
+    background-color: var(--stecon-interactive-disabled);
+    border-color: var(--stecon-interactive-disabled);
+    color: var(--stecon-text-secondary);
+}
+
+.stecon-button__spinner {
+    width: 1em;
+    height: 1em;
+    flex-shrink: 0;
+    border-radius: 50%;
+    border: 2px solid currentColor;
+    border-top-color: transparent;
+    animation: stecon-button-spin var(--stecon-duration-slow) linear infinite;
+}
+
+@keyframes stecon-button-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .stecon-button__spinner {
+        animation: none;
+    }
+}

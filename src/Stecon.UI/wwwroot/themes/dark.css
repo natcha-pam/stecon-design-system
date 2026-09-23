@@ -20,6 +20,19 @@
   --stecon-status-warning-surface: #3a2a10;
   --stecon-status-danger: #e2564f;
   --stecon-status-danger-surface: #3a1918;
+  /* Darker than status-danger: white on-interactive text on status-danger
+     (#e2564f) only reaches ~3.7:1 in dark theme (fails 4.5:1). This shade
+     reaches ~6.4:1 and is used exclusively for solid Danger button/icon-button
+     fills, leaving status-danger's text-on-surface contrast unchanged. */
+  --stecon-status-danger-strong: #a83832;
   --stecon-status-info: #4c9be0;
   --stecon-status-info-surface: #132a3a;
+
+  /* Interactive (M1C) - see themes/light.css for the semantic rationale. */
+  --stecon-interactive-default: #3f63d1;
+  --stecon-interactive-hover: #5578e0;
+  --stecon-interactive-active: #2f4bb0;
+  --stecon-interactive-disabled: #2a3660;
+  --stecon-on-interactive: #ffffff;
+  --stecon-focus-ring: #3f63d1;
 }

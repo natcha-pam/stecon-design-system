@@ -23,41 +23,41 @@
 <div class="stecon-gallery-controls">
     <div class="stecon-gallery-field">
         <label class="stecon-gallery-field__label" for="gallery-variant">Variant</label>
-        <select id="gallery-variant" class="stecon-gallery-select" @bind="_variant">
+        <SteconSelect TValue="SidebarVariant" @bind-Value="_variant" AdditionalAttributes="@(new Dictionary<string, object> { ["id"] = "gallery-variant" })">
             @foreach (var variant in Enum.GetValues<SidebarVariant>())
             {
                 <option value="@variant">@variant</option>
             }
-        </select>
+        </SteconSelect>
     </div>
 
     <div class="stecon-gallery-field">
         <label class="stecon-gallery-field__label" for="gallery-dataset">Dataset</label>
-        <select id="gallery-dataset" class="stecon-gallery-select" @bind="_dataset">
+        <SteconSelect TValue="string" @bind-Value="_dataset" AdditionalAttributes="@(new Dictionary<string, object> { ["id"] = "gallery-dataset" })">
             <option value="flat">Flat</option>
             <option value="grouped">Grouped</option>
             <option value="nested">Nested</option>
-        </select>
+        </SteconSelect>
     </div>
 
     <div class="stecon-gallery-field">
         <span class="stecon-gallery-field__label">States</span>
         <div class="stecon-gallery-toggles">
-            <label class="stecon-gallery-checkbox"><input type="checkbox" @bind="_collapsed" /> Collapsed</label>
-            <label class="stecon-gallery-checkbox"><input type="checkbox" @bind="_showBrand" /> Brand</label>
-            <label class="stecon-gallery-checkbox"><input type="checkbox" @bind="_showUser" /> User area</label>
+            <SteconCheckbox @bind-Value="_collapsed">Collapsed</SteconCheckbox>
+            <SteconCheckbox @bind-Value="_showBrand">Brand</SteconCheckbox>
+            <SteconCheckbox @bind-Value="_showUser">User area</SteconCheckbox>
         </div>
     </div>
 
     <div class="stecon-gallery-field">
         <span class="stecon-gallery-field__label">Actions</span>
         <div class="stecon-gallery-actions">
-            <button type="button" class="stecon-gallery-btn" @onclick="ToggleTheme">
+            <SteconButton Variant="ButtonVariant.Secondary" OnClick="ToggleTheme">
                 Theme: @ThemeService.Current
-            </button>
-            <button type="button" class="stecon-gallery-btn stecon-gallery-btn--primary" @onclick="OpenMobileDrawer">
+            </SteconButton>
+            <SteconButton Variant="ButtonVariant.Primary" OnClick="OpenMobileDrawer">
                 Open mobile drawer
-            </button>
+            </SteconButton>
         </div>
     </div>
 </div>

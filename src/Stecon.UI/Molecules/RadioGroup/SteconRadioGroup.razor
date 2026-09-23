@@ -1,0 +1,59 @@
+@namespace Stecon.UI
+@typeparam TValue
+
+@if (!string.IsNullOrWhiteSpace(Label))
+{
+    <fieldset class="stecon-radio-group">
+        <legend class="stecon-radio-group__legend">@Label</legend>
+        <CascadingValue Value="_context" IsFixed="false">
+            @ChildContent
+        </CascadingValue>
+    </fieldset>
+}
+else
+{
+    <div class="stecon-radio-group" role="radiogroup">
+        <CascadingValue Value="_context" IsFixed="false">
+            @ChildContent
+        </CascadingValue>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public TValue Value { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback<TValue> ValueChanged { get; set; }
+
+    [Parameter]
+    public Expression<Func<TValue>>? ValueExpression { get; set; }
+
+    [Parameter, EditorRequired]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>Optional group label. When supplied, renders as a native &lt;fieldset&gt;/&lt;legend&gt; (no extra ARIA needed).</summary>
+    [Parameter]
+    public string? Label { get; set; }
+
+    /// <summary>Explicit shared name. Defaults to a generated per-instance name so multiple groups never collide.</summary>
+    [Parameter]
+    public string? Name { get; set; }
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    private readonly string _generatedName = $"stecon-radio-{Guid.NewGuid():N}";
+    private RadioGroupContext<TValue> _context = null!;
+
+    protected override void OnParametersSet()
+    {
+        _context = new RadioGroupContext<TValue>
+        {
+            Name = Name ?? _generatedName,
+            SelectedValue = Value,
+            Disabled = Disabled,
+            SelectAsync = v => ValueChanged.InvokeAsync(v),
+        };
+    }
+}

@@ -1,0 +1,67 @@
+@namespace Stecon.UI
+
+<input class="@CssClass"
+       type="@TypeAttribute"
+       value="@Value"
+       placeholder="@Placeholder"
+       disabled="@Disabled"
+       readonly="@ReadOnly"
+       aria-invalid="@(IsInvalid ? "true" : null)"
+       aria-describedby="@DescribedBy"
+       @attributes="SplatAttributes"
+       @oninput="HandleInput" />
+
+@code {
+    [Parameter]
+    public string? Value { get; set; }
+
+    [Parameter]
+    public EventCallback<string?> ValueChanged { get; set; }
+
+    /// <summary>Optional - enables consumer-side &lt;ValidationMessage For="..."&gt; without coupling this component to EditContext.</summary>
+    [Parameter]
+    public Expression<Func<string?>>? ValueExpression { get; set; }
+
+    [Parameter]
+    public TextInputType Type { get; set; } = TextInputType.Text;
+
+    [Parameter]
+    public string? Placeholder { get; set; }
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    [Parameter]
+    public bool ReadOnly { get; set; }
+
+    [Parameter]
+    public bool IsInvalid { get; set; }
+
+    /// <summary>Id(s) of associated helper/error text, typically supplied by <see cref="SteconFormField"/>.</summary>
+    [Parameter]
+    public string? DescribedBy { get; set; }
+
+    [Parameter]
+    public ControlSize Size { get; set; } = ControlSize.Md;
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string SizeClass => Size.ToString().ToLowerInvariant();
+
+    private string CssClass => CssClassMerge.Combine($"stecon-input stecon-input--{SizeClass}", AdditionalAttributes);
+
+    private IReadOnlyDictionary<string, object>? SplatAttributes => CssClassMerge.AttributesWithoutClass(AdditionalAttributes);
+
+    private string TypeAttribute => Type switch
+    {
+        TextInputType.Email => "email",
+        TextInputType.Password => "password",
+        TextInputType.Number => "number",
+        TextInputType.Search => "search",
+        TextInputType.Tel => "tel",
+        _ => "text",
+    };
+
+    private Task HandleInput(ChangeEventArgs e) => ValueChanged.InvokeAsync(e.Value?.ToString());
+}

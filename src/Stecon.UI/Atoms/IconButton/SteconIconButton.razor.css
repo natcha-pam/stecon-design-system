@@ -1,0 +1,132 @@
+.stecon-icon-button {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: 1px solid transparent;
+    border-radius: var(--stecon-radius-sm);
+    color: var(--stecon-text-primary);
+    cursor: pointer;
+    transition: background-color var(--stecon-duration-fast) var(--stecon-ease-standard),
+                border-color var(--stecon-duration-fast) var(--stecon-ease-standard),
+                color var(--stecon-duration-fast) var(--stecon-ease-standard);
+}
+
+.stecon-icon-button:disabled {
+    cursor: not-allowed;
+}
+
+.stecon-icon-button:focus-visible {
+    outline: 2px solid var(--stecon-focus-ring);
+    outline-offset: 2px;
+}
+
+.stecon-icon-button--sm {
+    width: 2rem;
+    height: 2rem;
+}
+
+.stecon-icon-button--md {
+    width: 2.5rem;
+    height: 2.5rem;
+}
+
+.stecon-icon-button--lg {
+    width: 3rem;
+    height: 3rem;
+}
+
+.stecon-icon-button--primary {
+    background-color: var(--stecon-interactive-default);
+    border-color: var(--stecon-interactive-default);
+    color: var(--stecon-on-interactive);
+}
+
+.stecon-icon-button--primary:hover:not(:disabled) {
+    background-color: var(--stecon-interactive-hover);
+}
+
+.stecon-icon-button--primary:disabled {
+    background-color: var(--stecon-interactive-disabled);
+    border-color: var(--stecon-interactive-disabled);
+    color: var(--stecon-text-secondary);
+}
+
+.stecon-icon-button--secondary {
+    background-color: var(--stecon-surface-page);
+    border-color: var(--stecon-border-default);
+}
+
+.stecon-icon-button--secondary:hover:not(:disabled) {
+    background-color: var(--stecon-border-default);
+}
+
+.stecon-icon-button--secondary:disabled {
+    color: var(--stecon-text-secondary);
+}
+
+.stecon-icon-button--outline {
+    background-color: transparent;
+    border-color: var(--stecon-interactive-default);
+    color: var(--stecon-interactive-default);
+}
+
+.stecon-icon-button--outline:hover:not(:disabled) {
+    background-color: var(--stecon-interactive-disabled);
+}
+
+.stecon-icon-button--outline:disabled {
+    border-color: var(--stecon-border-default);
+    color: var(--stecon-text-secondary);
+}
+
+.stecon-icon-button--ghost {
+    background-color: transparent;
+    border-color: transparent;
+}
+
+.stecon-icon-button--ghost:hover:not(:disabled) {
+    background-color: var(--stecon-surface-page);
+}
+
+.stecon-icon-button--ghost:disabled {
+    color: var(--stecon-text-secondary);
+}
+
+.stecon-icon-button--danger {
+    background-color: var(--stecon-status-danger-strong);
+    border-color: var(--stecon-status-danger-strong);
+    color: var(--stecon-on-interactive);
+}
+
+.stecon-icon-button--danger:hover:not(:disabled) {
+    filter: brightness(0.92);
+}
+
+.stecon-icon-button--danger:disabled {
+    background-color: var(--stecon-interactive-disabled);
+    border-color: var(--stecon-interactive-disabled);
+    color: var(--stecon-text-secondary);
+}
+
+.stecon-icon-button__spinner {
+    width: 1.1em;
+    height: 1.1em;
+    border-radius: 50%;
+    border: 2px solid currentColor;
+    border-top-color: transparent;
+    animation: stecon-icon-button-spin var(--stecon-duration-slow) linear infinite;
+}
+
+@keyframes stecon-icon-button-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .stecon-icon-button__spinner {
+        animation: none;
+    }
+}

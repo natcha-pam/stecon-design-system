@@ -1,0 +1,66 @@
+@namespace Stecon.UI
+
+<div class="stecon-form-field">
+    @if (!string.IsNullOrWhiteSpace(Label))
+    {
+        <label class="stecon-form-field__label" for="@_controlId">
+            @Label
+            @if (Required)
+            {
+                <span class="stecon-form-field__required" aria-hidden="true">*</span>
+                <span class="stecon-visually-hidden">(@RequiredHiddenText)</span>
+            }
+        </label>
+    }
+    @if (ChildContent is not null)
+    {
+        @ChildContent(_context)
+    }
+    @if (HasError)
+    {
+        <p class="stecon-form-field__error" id="@_errorId">@ErrorText</p>
+    }
+    else if (!string.IsNullOrWhiteSpace(HelperText))
+    {
+        <p class="stecon-form-field__helper" id="@_helperId">@HelperText</p>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string? Label { get; set; }
+
+    [Parameter]
+    public bool Required { get; set; }
+
+    [Parameter]
+    public string? HelperText { get; set; }
+
+    /// <summary>Non-empty ErrorText marks the field invalid and takes precedence over HelperText.</summary>
+    [Parameter]
+    public string? ErrorText { get; set; }
+
+    [Parameter, EditorRequired]
+    public RenderFragment<FormFieldContext>? ChildContent { get; set; }
+
+    private const string RequiredHiddenText = "required";
+
+    private readonly string _controlId = $"stecon-field-{Guid.NewGuid():N}";
+    private readonly string _errorId = $"stecon-field-error-{Guid.NewGuid():N}";
+    private readonly string _helperId = $"stecon-field-helper-{Guid.NewGuid():N}";
+
+    private bool HasError => !string.IsNullOrWhiteSpace(ErrorText);
+
+    private FormFieldContext _context = null!;
+
+    protected override void OnParametersSet()
+    {
+        _context = new FormFieldContext
+        {
+            ControlId = _controlId,
+            DescribedBy = HasError ? _errorId : (!string.IsNullOrWhiteSpace(HelperText) ? _helperId : null),
+            IsInvalid = HasError,
+            Required = Required,
+        };
+    }
+}

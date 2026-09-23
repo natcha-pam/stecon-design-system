@@ -1,0 +1,54 @@
+@namespace Stecon.UI
+
+<textarea class="@CssClass"
+          placeholder="@Placeholder"
+          disabled="@Disabled"
+          readonly="@ReadOnly"
+          rows="@Rows"
+          aria-invalid="@(IsInvalid ? "true" : null)"
+          aria-describedby="@DescribedBy"
+          @attributes="SplatAttributes"
+          @oninput="HandleInput">@Value</textarea>
+
+@code {
+    [Parameter]
+    public string? Value { get; set; }
+
+    [Parameter]
+    public EventCallback<string?> ValueChanged { get; set; }
+
+    [Parameter]
+    public Expression<Func<string?>>? ValueExpression { get; set; }
+
+    [Parameter]
+    public string? Placeholder { get; set; }
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    [Parameter]
+    public bool ReadOnly { get; set; }
+
+    [Parameter]
+    public bool IsInvalid { get; set; }
+
+    [Parameter]
+    public string? DescribedBy { get; set; }
+
+    [Parameter]
+    public ControlSize Size { get; set; } = ControlSize.Md;
+
+    [Parameter]
+    public int Rows { get; set; } = 4;
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string SizeClass => Size.ToString().ToLowerInvariant();
+
+    private string CssClass => CssClassMerge.Combine($"stecon-textarea stecon-textarea--{SizeClass}", AdditionalAttributes);
+
+    private IReadOnlyDictionary<string, object>? SplatAttributes => CssClassMerge.AttributesWithoutClass(AdditionalAttributes);
+
+    private Task HandleInput(ChangeEventArgs e) => ValueChanged.InvokeAsync(e.Value?.ToString());
+}

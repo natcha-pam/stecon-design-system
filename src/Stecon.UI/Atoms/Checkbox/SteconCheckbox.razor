@@ -1,0 +1,45 @@
+@namespace Stecon.UI
+
+<label class="stecon-checkbox @(Disabled ? "stecon-checkbox--disabled" : null)">
+    <input type="checkbox"
+           class="@CssClass"
+           checked="@Value"
+           disabled="@Disabled"
+           aria-describedby="@DescribedBy"
+           @attributes="SplatAttributes"
+           @onchange="HandleChange" />
+    @if (ChildContent is not null)
+    {
+        <span class="stecon-checkbox__label">@ChildContent</span>
+    }
+</label>
+
+@code {
+    [Parameter]
+    public bool Value { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> ValueChanged { get; set; }
+
+    [Parameter]
+    public Expression<Func<bool>>? ValueExpression { get; set; }
+
+    /// <summary>Inline label content. Checkbox owns its own label (conventionally inline, unlike FormField's above-label pattern).</summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    [Parameter]
+    public string? DescribedBy { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string CssClass => CssClassMerge.Combine("stecon-checkbox__input", AdditionalAttributes);
+
+    private IReadOnlyDictionary<string, object>? SplatAttributes => CssClassMerge.AttributesWithoutClass(AdditionalAttributes);
+
+    private Task HandleChange(ChangeEventArgs e) => ValueChanged.InvokeAsync((bool)(e.Value ?? false));
+}

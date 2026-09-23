@@ -1,0 +1,30 @@
+.stecon-radio {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--stecon-space-2);
+    color: var(--stecon-text-primary);
+    font-size: var(--stecon-font-size-md);
+    cursor: pointer;
+}
+
+.stecon-radio--disabled {
+    color: var(--stecon-text-secondary);
+    cursor: not-allowed;
+}
+
+.stecon-radio__input {
+    width: 1.125rem;
+    height: 1.125rem;
+    flex-shrink: 0;
+    accent-color: var(--stecon-interactive-default);
+    cursor: inherit;
+}
+
+.stecon-radio__input:focus-visible {
+    outline: 2px solid var(--stecon-focus-ring);
+    outline-offset: 2px;
+}
+
+.stecon-radio__label {
+    min-width: 0;
+}

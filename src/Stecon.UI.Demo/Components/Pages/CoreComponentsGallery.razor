@@ -1,0 +1,275 @@
+@page "/core-components-gallery"
+@inject IThemeService ThemeService
+@implements IDisposable
+
+<PageTitle>Core Components Gallery</PageTitle>
+
+<h1>Core Components Gallery</h1>
+<p>
+    Verify the M1C atoms/molecules (Button, IconButton, Input, Textarea, Select,
+    Checkbox, Radio, Switch, FormField) across states and themes. Resize the
+    browser to <strong>375px</strong>, <strong>768px</strong>, and
+    <strong>1440px</strong> to complete responsive verification, and toggle the
+    theme below to verify Light/Dark.
+</p>
+
+<div class="stecon-core-gallery-toolbar">
+    <SteconButton Variant="ButtonVariant.Secondary" OnClick="ToggleTheme">
+        Theme: @ThemeService.Current
+    </SteconButton>
+</div>
+
+<section class="stecon-core-gallery-section">
+    <h2>Button</h2>
+    <div class="stecon-core-gallery-table">
+        @foreach (var variant in Enum.GetValues<ButtonVariant>())
+        {
+            <div class="stecon-core-gallery-row">
+                <span class="stecon-core-gallery-row__label">@variant</span>
+                <SteconButton Variant="variant" Size="ControlSize.Sm">Small</SteconButton>
+                <SteconButton Variant="variant" Size="ControlSize.Md">Medium</SteconButton>
+                <SteconButton Variant="variant" Size="ControlSize.Lg">Large</SteconButton>
+            </div>
+        }
+    </div>
+
+    <div class="stecon-core-gallery-row">
+        <SteconButton Variant="ButtonVariant.Primary">
+            <IconStart><SteconIcon Name="IconName.Home" /></IconStart>
+            <ChildContent>Icon start</ChildContent>
+        </SteconButton>
+        <SteconButton Variant="ButtonVariant.Primary">
+            <ChildContent>Icon end</ChildContent>
+            <IconEnd><SteconIcon Name="IconName.ChevronRight" /></IconEnd>
+        </SteconButton>
+        <SteconButton Variant="ButtonVariant.Primary" Disabled="true">Disabled</SteconButton>
+        <SteconButton Variant="ButtonVariant.Primary" Loading="@_buttonLoading" OnClick="ToggleButtonLoading">
+            Loading demo
+        </SteconButton>
+    </div>
+
+    <div class="stecon-core-gallery-row">
+        <SteconButton Variant="ButtonVariant.Primary" FullWidth="true">Full width button</SteconButton>
+    </div>
+</section>
+
+<section class="stecon-core-gallery-section">
+    <h2>IconButton</h2>
+    <div class="stecon-core-gallery-row">
+        @foreach (var variant in Enum.GetValues<ButtonVariant>())
+        {
+            <SteconIconButton Variant="variant" Icon="IconName.User" AccessibleLabel="@($"{variant} icon button")" />
+        }
+    </div>
+    <div class="stecon-core-gallery-row">
+        <SteconIconButton Size="ControlSize.Sm" Icon="IconName.Close" AccessibleLabel="Small close" />
+        <SteconIconButton Size="ControlSize.Md" Icon="IconName.Close" AccessibleLabel="Medium close" />
+        <SteconIconButton Size="ControlSize.Lg" Icon="IconName.Close" AccessibleLabel="Large close" />
+        <SteconIconButton Disabled="true" Icon="IconName.Close" AccessibleLabel="Disabled close" />
+        <SteconIconButton Loading="@_iconButtonLoading" Icon="IconName.Close" AccessibleLabel="Loading close" OnClick="ToggleIconButtonLoading" />
+    </div>
+</section>
+
+<section class="stecon-core-gallery-section">
+    <h2>Input &amp; Textarea</h2>
+    <div class="stecon-core-gallery-grid">
+        <SteconFormField Label="Default">
+            <ChildContent Context="ctx">
+                <SteconInput @bind-Value="_textDefault" DescribedBy="@ctx.DescribedBy" />
+            </ChildContent>
+        </SteconFormField>
+
+        <SteconFormField Label="Filled">
+            <ChildContent Context="ctx">
+                <SteconInput @bind-Value="_textFilled" DescribedBy="@ctx.DescribedBy" />
+            </ChildContent>
+        </SteconFormField>
+
+        <SteconFormField Label="Disabled">
+            <ChildContent Context="ctx">
+                <SteconInput @bind-Value="_textDisabled" Disabled="true" DescribedBy="@ctx.DescribedBy" />
+            </ChildContent>
+        </SteconFormField>
+
+        <SteconFormField Label="Read-only">
+            <ChildContent Context="ctx">
+                <SteconInput @bind-Value="_textReadOnly" ReadOnly="true" DescribedBy="@ctx.DescribedBy" />
+            </ChildContent>
+        </SteconFormField>
+
+        <SteconFormField Label="With helper text" HelperText="We'll never share this.">
+            <ChildContent Context="ctx">
+                <SteconInput @bind-Value="_textHelper" DescribedBy="@ctx.DescribedBy" />
+            </ChildContent>
+        </SteconFormField>
+
+        <SteconFormField Label="Invalid" Required="true" ErrorText="This field is required.">
+            <ChildContent Context="ctx">
+                <SteconInput @bind-Value="_textInvalid" IsInvalid="@ctx.IsInvalid" DescribedBy="@ctx.DescribedBy" />
+            </ChildContent>
+        </SteconFormField>
+
+        <SteconFormField Label="ชื่อเต็มภาษาไทยที่ค่อนข้างยาวมากเพื่อทดสอบการตัดคำ / A rather long bilingual label to test wrapping">
+            <ChildContent Context="ctx">
+                <SteconInput @bind-Value="_textLongLabel" Placeholder="กรอกข้อมูล / Enter text" DescribedBy="@ctx.DescribedBy" />
+            </ChildContent>
+        </SteconFormField>
+
+        <SteconFormField Label="Textarea">
+            <ChildContent Context="ctx">
+                <SteconTextarea @bind-Value="_textareaValue" DescribedBy="@ctx.DescribedBy" />
+            </ChildContent>
+        </SteconFormField>
+    </div>
+</section>
+
+<section class="stecon-core-gallery-section">
+    <h2>Select</h2>
+    <div class="stecon-core-gallery-grid">
+        <SteconFormField Label="Badge variant (generic TValue example)">
+            <ChildContent Context="ctx">
+                <SteconSelect TValue="BadgeVariant" @bind-Value="_selectedBadgeVariant" DescribedBy="@ctx.DescribedBy">
+                    @foreach (var variant in Enum.GetValues<BadgeVariant>())
+                    {
+                        <option value="@variant">@variant</option>
+                    }
+                </SteconSelect>
+            </ChildContent>
+        </SteconFormField>
+
+        <SteconFormField Label="Disabled">
+            <ChildContent Context="ctx">
+                <SteconSelect TValue="string" Value="@("b")" ValueChanged="@((string v) => { })" Disabled="true" DescribedBy="@ctx.DescribedBy">
+                    <option value="a">Option A</option>
+                    <option value="b">Option B</option>
+                </SteconSelect>
+            </ChildContent>
+        </SteconFormField>
+
+        <SteconFormField Label="Invalid" ErrorText="Please choose an option.">
+            <ChildContent Context="ctx">
+                <SteconSelect TValue="string" @bind-Value="_invalidSelectValue" IsInvalid="@ctx.IsInvalid" DescribedBy="@ctx.DescribedBy">
+                    <option value="">-- Select --</option>
+                    <option value="a">Option A</option>
+                    <option value="b">Option B</option>
+                </SteconSelect>
+            </ChildContent>
+        </SteconFormField>
+    </div>
+    <p>Selected badge variant preview: <SteconBadge Variant="_selectedBadgeVariant">@_selectedBadgeVariant</SteconBadge></p>
+</section>
+
+<section class="stecon-core-gallery-section">
+    <h2>Checkbox, Radio &amp; Switch</h2>
+    <div class="stecon-core-gallery-row">
+        <SteconCheckbox @bind-Value="_checkboxChecked">Checked/unchecked</SteconCheckbox>
+        <SteconCheckbox Value="true" Disabled="true">Disabled (checked)</SteconCheckbox>
+        <SteconCheckbox Value="false" Disabled="true">Disabled (unchecked)</SteconCheckbox>
+        <SteconCheckbox @bind-Value="_checkboxThai">ยอมรับข้อกำหนดและเงื่อนไข (Thai label)</SteconCheckbox>
+    </div>
+
+    <div class="stecon-core-gallery-row">
+        <SteconSwitch @bind-Value="_switchValue">Notifications</SteconSwitch>
+        <SteconSwitch Value="true" Disabled="true">Disabled (on)</SteconSwitch>
+        <SteconSwitch Value="false" Disabled="true">Disabled (off)</SteconSwitch>
+    </div>
+
+    <p>Two independent radio groups on the same page - verifies generated group names never collide:</p>
+    <div class="stecon-core-gallery-row stecon-core-gallery-row--align-start">
+        <SteconRadioGroup TValue="string" Label="Shipping speed" @bind-Value="_shippingSpeed">
+            <SteconRadio TValue="string" Value="@("standard")">Standard</SteconRadio>
+            <SteconRadio TValue="string" Value="@("express")">Express (ด่วนพิเศษ)</SteconRadio>
+            <SteconRadio TValue="string" Value="@("overnight")" Disabled="true">Overnight (disabled)</SteconRadio>
+        </SteconRadioGroup>
+
+        <SteconRadioGroup TValue="string" Label="Payment method" @bind-Value="_paymentMethod">
+            <SteconRadio TValue="string" Value="@("card")">Card</SteconRadio>
+            <SteconRadio TValue="string" Value="@("transfer")">Bank transfer (โอนเงิน)</SteconRadio>
+        </SteconRadioGroup>
+    </div>
+    <p>Selected: shipping=@_shippingSpeed, payment=@_paymentMethod</p>
+</section>
+
+<section class="stecon-core-gallery-section">
+    <h2>FormField</h2>
+    <div class="stecon-core-gallery-grid">
+        <SteconFormField Label="Plain label">
+            <ChildContent Context="ctx">
+                <SteconInput @bind-Value="_formFieldPlain" DescribedBy="@ctx.DescribedBy" />
+            </ChildContent>
+        </SteconFormField>
+
+        <SteconFormField Label="Required field" Required="true">
+            <ChildContent Context="ctx">
+                <SteconInput @bind-Value="_formFieldRequired" DescribedBy="@ctx.DescribedBy" />
+            </ChildContent>
+        </SteconFormField>
+
+        <SteconFormField Label="Helper text only" HelperText="Extra guidance for the consumer.">
+            <ChildContent Context="ctx">
+                <SteconInput @bind-Value="_formFieldHelper" DescribedBy="@ctx.DescribedBy" />
+            </ChildContent>
+        </SteconFormField>
+
+        <SteconFormField Label="Error takes precedence" HelperText="This helper is replaced by the error." ErrorText="Something went wrong.">
+            <ChildContent Context="ctx">
+                <SteconInput @bind-Value="_formFieldError" IsInvalid="@ctx.IsInvalid" DescribedBy="@ctx.DescribedBy" />
+            </ChildContent>
+        </SteconFormField>
+    </div>
+</section>
+
+<section class="stecon-core-gallery-section">
+    <h2>Badge (reused, unchanged)</h2>
+    <div class="stecon-core-gallery-row">
+        @foreach (var variant in Enum.GetValues<BadgeVariant>())
+        {
+            <SteconBadge Variant="variant">@variant</SteconBadge>
+        }
+    </div>
+</section>
+
+@code {
+    private bool _buttonLoading;
+    private bool _iconButtonLoading;
+
+    private string? _textDefault;
+    private string? _textFilled = "Prefilled value";
+    private string? _textDisabled = "Cannot edit";
+    private string? _textReadOnly = "Read-only value";
+    private string? _textHelper;
+    private string? _textInvalid;
+    private string? _textLongLabel;
+    private string? _textareaValue;
+
+    private BadgeVariant _selectedBadgeVariant = BadgeVariant.Info;
+    private string _invalidSelectValue = "";
+
+    private bool _checkboxChecked = true;
+    private bool _checkboxThai;
+    private bool _switchValue = true;
+
+    private string _shippingSpeed = "standard";
+    private string _paymentMethod = "card";
+
+    private string? _formFieldPlain;
+    private string? _formFieldRequired;
+    private string? _formFieldHelper;
+    private string? _formFieldError;
+
+    private void ToggleTheme() =>
+        ThemeService.SetTheme(ThemeService.Current == ThemeMode.Light ? ThemeMode.Dark : ThemeMode.Light);
+
+    private void ToggleButtonLoading() => _buttonLoading = !_buttonLoading;
+
+    private void ToggleIconButtonLoading() => _iconButtonLoading = !_iconButtonLoading;
+
+    protected override void OnInitialized()
+    {
+        ThemeService.ThemeChanged += OnThemeChanged;
+    }
+
+    private void OnThemeChanged(ThemeMode mode) => InvokeAsync(StateHasChanged);
+
+    public void Dispose() => ThemeService.ThemeChanged -= OnThemeChanged;
+}
