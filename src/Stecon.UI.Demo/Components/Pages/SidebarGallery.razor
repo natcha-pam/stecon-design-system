@@ -5,7 +5,7 @@
 @{
     RenderFragment userContent = @<text>
         <SteconAvatar InitialsText="JD" AltText="Jane Doe" />
-        <span>Jane Doe</span>
+        <span class="stecon-gallery-user-name">Jane Doe</span>
     </text>;
 }
 
@@ -21,31 +21,45 @@
 </p>
 
 <div class="stecon-gallery-controls">
-    <label>
-        Variant
-        <select @bind="_variant">
+    <div class="stecon-gallery-field">
+        <label class="stecon-gallery-field__label" for="gallery-variant">Variant</label>
+        <select id="gallery-variant" class="stecon-gallery-select" @bind="_variant">
             @foreach (var variant in Enum.GetValues<SidebarVariant>())
             {
                 <option value="@variant">@variant</option>
             }
         </select>
-    </label>
+    </div>
 
-    <label>
-        Dataset
-        <select @bind="_dataset">
+    <div class="stecon-gallery-field">
+        <label class="stecon-gallery-field__label" for="gallery-dataset">Dataset</label>
+        <select id="gallery-dataset" class="stecon-gallery-select" @bind="_dataset">
             <option value="flat">Flat</option>
             <option value="grouped">Grouped</option>
             <option value="nested">Nested</option>
         </select>
-    </label>
+    </div>
 
-    <label><input type="checkbox" @bind="_collapsed" /> Collapsed</label>
-    <label><input type="checkbox" @bind="_showBrand" /> Brand</label>
-    <label><input type="checkbox" @bind="_showUser" /> User area</label>
+    <div class="stecon-gallery-field">
+        <span class="stecon-gallery-field__label">States</span>
+        <div class="stecon-gallery-toggles">
+            <label class="stecon-gallery-checkbox"><input type="checkbox" @bind="_collapsed" /> Collapsed</label>
+            <label class="stecon-gallery-checkbox"><input type="checkbox" @bind="_showBrand" /> Brand</label>
+            <label class="stecon-gallery-checkbox"><input type="checkbox" @bind="_showUser" /> User area</label>
+        </div>
+    </div>
 
-    <button type="button" class="btn" @onclick="ToggleTheme">Theme: @ThemeService.Current</button>
-    <button type="button" class="btn btn-primary" @onclick="OpenMobileDrawer">Open mobile drawer</button>
+    <div class="stecon-gallery-field">
+        <span class="stecon-gallery-field__label">Actions</span>
+        <div class="stecon-gallery-actions">
+            <button type="button" class="stecon-gallery-btn" @onclick="ToggleTheme">
+                Theme: @ThemeService.Current
+            </button>
+            <button type="button" class="stecon-gallery-btn stecon-gallery-btn--primary" @onclick="OpenMobileDrawer">
+                Open mobile drawer
+            </button>
+        </div>
+    </div>
 </div>
 
 <div class="stecon-gallery-preview">
@@ -58,7 +72,13 @@
                    @bind-IsMobileOpen="_mobileOpen" />
 
     <div class="stecon-gallery-preview__content">
-        <p>This box represents the main content region next to the sidebar.</p>
+        <div class="stecon-gallery-preview__header">
+            <span class="stecon-gallery-preview__heading">Main content</span>
+            <span class="stecon-gallery-preview__meta">@_variant &middot; @(_collapsed ? "Collapsed" : "Expanded")</span>
+        </div>
+        <p>This area represents the application's main content region next to the sidebar.</p>
+        <div class="stecon-gallery-placeholder"></div>
+        <div class="stecon-gallery-placeholder"></div>
     </div>
 </div>
 

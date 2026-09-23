@@ -32,12 +32,16 @@
     background-color: var(--stecon-status-info-surface);
     color: var(--stecon-status-info);
     font-weight: var(--stecon-font-weight-semibold);
+    border-left: 3px solid var(--stecon-status-info);
 }
 
 .stecon-sidebar-item__link--disabled {
     color: var(--stecon-text-secondary);
     cursor: not-allowed;
-    opacity: 0.6;
+}
+
+.stecon-sidebar-item__link--disabled:hover {
+    background-color: transparent;
 }
 
 .stecon-sidebar-item__icon {
@@ -51,10 +55,15 @@
 
 .stecon-sidebar-item__label {
     flex: 1 1 auto;
+    min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     text-align: left;
+}
+
+.stecon-sidebar-item__row ::deep .stecon-badge {
+    flex-shrink: 0;
 }
 
 .stecon-sidebar-item__chevron {

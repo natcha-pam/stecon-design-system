@@ -33,6 +33,20 @@ public class SteconSidebarTests : BunitContext
     }
 
     [Fact]
+    public void PlainDestinationItem_WithoutConfiguredIcon_RendersNoIconGlyphOrChevron()
+    {
+        // A leaf item with Href and no Children must never show an expand
+        // chevron, and must not fabricate an icon when none is configured.
+        var items = new List<SteconNavItem> { new() { Id = "a", Label = "A", Href = "a" } };
+
+        var cut = Render<SteconSidebar>(p => p.Add(x => x.Items, items));
+
+        var iconSlot = cut.Find(".stecon-sidebar-item__icon");
+        Assert.Empty(iconSlot.QuerySelectorAll("svg"));
+        Assert.Empty(cut.FindAll(".stecon-sidebar-item__chevron"));
+    }
+
+    [Fact]
     public void ItemRow_AlwaysCarriesTitleTooltip_RegardlessOfCollapsedFlag()
     {
         // Title must not depend solely on the bound Collapsed flag, since the

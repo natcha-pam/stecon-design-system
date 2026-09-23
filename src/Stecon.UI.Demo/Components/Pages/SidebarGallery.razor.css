@@ -1,8 +1,14 @@
+/*
+  Gallery-only playground styling - not part of the Stecon.UI public
+  component API (see AGENTS.md: local Gallery-only styling is allowed,
+  but must not be promoted into public Select/Input/Form components).
+*/
+
 .stecon-gallery-controls {
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
-    gap: var(--stecon-space-4);
+    align-items: flex-end;
+    gap: var(--stecon-space-6);
     padding: var(--stecon-space-4);
     margin-bottom: var(--stecon-space-4);
     background-color: var(--stecon-surface-card);
@@ -10,11 +16,96 @@
     border-radius: var(--stecon-radius-md);
 }
 
-.stecon-gallery-controls label {
+.stecon-gallery-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--stecon-space-2);
+}
+
+.stecon-gallery-field__label {
+    font-size: var(--stecon-font-size-xs);
+    font-weight: var(--stecon-font-weight-semibold);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--stecon-text-secondary);
+}
+
+.stecon-gallery-select {
+    min-width: 9rem;
+    height: 2.25rem;
+    padding: 0 var(--stecon-space-3);
+    border: 1px solid var(--stecon-border-default);
+    border-radius: var(--stecon-radius-sm);
+    background-color: var(--stecon-surface-page);
+    color: var(--stecon-text-primary);
+    font-size: var(--stecon-font-size-sm);
+    font-family: inherit;
+}
+
+.stecon-gallery-select:focus-visible {
+    outline: 2px solid var(--stecon-status-info);
+    outline-offset: 1px;
+}
+
+.stecon-gallery-toggles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--stecon-space-2);
+    padding: var(--stecon-space-1) var(--stecon-space-3);
+    border: 1px solid var(--stecon-border-default);
+    border-radius: var(--stecon-radius-sm);
+    background-color: var(--stecon-surface-page);
+    height: 2.25rem;
+    align-items: center;
+}
+
+.stecon-gallery-checkbox {
     display: flex;
     align-items: center;
-    gap: var(--stecon-space-2);
+    gap: var(--stecon-space-1);
     font-size: var(--stecon-font-size-sm);
+    color: var(--stecon-text-primary);
+    white-space: nowrap;
+}
+
+.stecon-gallery-actions {
+    display: flex;
+    gap: var(--stecon-space-2);
+}
+
+.stecon-gallery-btn {
+    display: inline-flex;
+    align-items: center;
+    height: 2.25rem;
+    padding: 0 var(--stecon-space-4);
+    border: 1px solid var(--stecon-border-default);
+    border-radius: var(--stecon-radius-sm);
+    background-color: var(--stecon-surface-page);
+    color: var(--stecon-text-primary);
+    font-size: var(--stecon-font-size-sm);
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color var(--stecon-duration-fast) var(--stecon-ease-standard);
+}
+
+.stecon-gallery-btn:hover {
+    background-color: var(--stecon-border-default);
+}
+
+.stecon-gallery-btn:focus-visible {
+    outline: 2px solid var(--stecon-status-info);
+    outline-offset: 1px;
+}
+
+.stecon-gallery-btn--primary {
+    background-color: var(--stecon-status-info);
+    border-color: var(--stecon-status-info);
+    color: var(--stecon-brand-white);
+}
+
+.stecon-gallery-btn--primary:hover {
+    filter: brightness(0.92);
 }
 
 .stecon-gallery-preview {
@@ -27,6 +118,47 @@
 
 .stecon-gallery-preview__content {
     flex: 1 1 auto;
+    min-width: 0;
     padding: var(--stecon-space-6);
     background-color: var(--stecon-surface-page);
+}
+
+.stecon-gallery-preview__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--stecon-space-3);
+    padding-bottom: var(--stecon-space-3);
+    margin-bottom: var(--stecon-space-4);
+    border-bottom: 1px solid var(--stecon-border-default);
+}
+
+.stecon-gallery-preview__heading {
+    font-size: var(--stecon-font-size-lg);
+    font-weight: var(--stecon-font-weight-semibold);
+}
+
+.stecon-gallery-preview__meta {
+    font-size: var(--stecon-font-size-sm);
+    color: var(--stecon-text-secondary);
+}
+
+.stecon-gallery-placeholder {
+    height: 3rem;
+    margin-top: var(--stecon-space-3);
+    border: 1px dashed var(--stecon-border-default);
+    border-radius: var(--stecon-radius-sm);
+    background-color: var(--stecon-surface-card);
+}
+
+/* Demo-only: hide the sample user name in the collapsed/icon-only rail. */
+.stecon-sidebar-user--collapsed .stecon-gallery-user-name {
+    display: none;
+}
+
+@media (max-width: 640px) {
+    .stecon-gallery-controls {
+        align-items: stretch;
+    }
 }

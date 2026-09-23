@@ -1,3 +1,14 @@
+/*
+  No global box-sizing reset exists in Foundation; without border-box, any
+  descendant combining width:100% with padding overflows its container by
+  the padding amount (the root cause of badge/row clipping). Scope the fix
+  to the sidebar subtree only.
+*/
+.stecon-sidebar,
+.stecon-sidebar ::deep * {
+    box-sizing: border-box;
+}
+
 .stecon-sidebar {
     display: flex;
     flex-direction: column;
@@ -18,28 +29,66 @@
 
 .stecon-sidebar__nav {
     flex: 1 1 auto;
+    min-width: 0;
     margin: 0;
     padding: var(--stecon-space-2) 0;
     list-style: none;
 }
 
 .stecon-sidebar__collapse-toggle {
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    justify-content: center;
-    width: 2rem;
-    height: 2rem;
-    margin: 0 var(--stecon-space-4) var(--stecon-space-2);
-    border: 1px solid var(--stecon-border-default);
+    gap: var(--stecon-space-3);
+    width: calc(100% - (var(--stecon-space-4) * 2));
+    min-width: 0;
+    margin: var(--stecon-space-2) var(--stecon-space-4) var(--stecon-space-1);
+    padding: var(--stecon-space-2) var(--stecon-space-3);
+    border: none;
     border-radius: var(--stecon-radius-sm);
     background: none;
     color: var(--stecon-text-secondary);
+    font-size: var(--stecon-font-size-sm);
+    font-family: inherit;
     cursor: pointer;
+    transition: background-color var(--stecon-duration-fast) var(--stecon-ease-standard);
+}
+
+.stecon-sidebar__collapse-toggle:hover {
+    background-color: var(--stecon-surface-page);
 }
 
 .stecon-sidebar__collapse-toggle:focus-visible {
     outline: 2px solid var(--stecon-status-info);
     outline-offset: 2px;
+}
+
+.stecon-sidebar__collapse-icon {
+    display: inline-flex;
+    width: 1.25rem;
+    height: 1.25rem;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+}
+
+.stecon-sidebar__collapse-label {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: left;
+}
+
+/* Collapsed: icon-only, centered - matches the nav item rail geometry. */
+.stecon-sidebar--collapsed .stecon-sidebar__collapse-toggle {
+    width: auto;
+    margin-inline: auto;
+    justify-content: center;
+}
+
+.stecon-sidebar--collapsed .stecon-sidebar__collapse-label {
+    display: none;
 }
 
 /* Compact: denser geometry; still supports expanded/collapsed (not permanently collapsed). */
@@ -108,6 +157,15 @@
     }
 
     .stecon-sidebar:not(.stecon-sidebar--mobile-open) .stecon-sidebar__collapse-toggle {
+        display: none;
+    }
+
+    .stecon-sidebar:not(.stecon-sidebar--mobile-open) ::deep .stecon-sidebar-brand {
+        justify-content: center;
+        padding-inline: var(--stecon-space-2);
+    }
+
+    .stecon-sidebar:not(.stecon-sidebar--mobile-open) ::deep .stecon-sidebar-brand__title {
         display: none;
     }
 }

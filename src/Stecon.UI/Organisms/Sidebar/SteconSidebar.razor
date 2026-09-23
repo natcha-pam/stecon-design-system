@@ -20,7 +20,10 @@
         <button type="button" class="stecon-sidebar__collapse-toggle"
                 aria-label="@(Collapsed ? "Expand sidebar" : "Collapse sidebar")"
                 @onclick="ToggleCollapsed">
-            <SteconIcon Name="@(Collapsed ? IconName.ChevronRight : IconName.ChevronDown)" />
+            <span class="stecon-sidebar__collapse-icon">
+                <SteconIcon Name="@(Collapsed ? IconName.ChevronRight : IconName.ChevronDown)" />
+            </span>
+            <span class="stecon-sidebar__collapse-label">@(Collapsed ? "Expand" : "Collapse")</span>
         </button>
     }
 

@@ -4,19 +4,29 @@
     gap: var(--stecon-space-3);
     padding: var(--stecon-space-4);
     min-height: 2.5rem;
+    min-width: 0;
+    border-bottom: 1px solid var(--stecon-border-default);
 }
 
 .stecon-sidebar-brand__logo {
-    width: 2rem;
-    height: 2rem;
+    width: 2.25rem;
+    height: 2.25rem;
     object-fit: contain;
     flex-shrink: 0;
 }
 
 .stecon-sidebar-brand__title {
+    flex: 1 1 auto;
+    min-width: 0;
     font-size: var(--stecon-font-size-lg);
     font-weight: var(--stecon-font-weight-semibold);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+/* Collapsed: center the logo instead of leaving it flush-left in the narrow rail. */
+.stecon-sidebar--collapsed .stecon-sidebar-brand {
+    justify-content: center;
+    padding-inline: var(--stecon-space-2);
 }
