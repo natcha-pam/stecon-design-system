@@ -1,0 +1,29 @@
+.stecon-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    /* 50% is a geometric circle, not a Foundation radius step - accepted as-is. */
+    border-radius: 50%;
+    background-color: var(--stecon-surface-page);
+    color: var(--stecon-text-secondary);
+    font-size: var(--stecon-font-size-xs);
+    font-weight: var(--stecon-font-weight-semibold);
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.stecon-avatar--sm {
+    width: 1.75rem;
+    height: 1.75rem;
+}
+
+.stecon-avatar--md {
+    width: 2.25rem;
+    height: 2.25rem;
+}
+
+.stecon-avatar__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}

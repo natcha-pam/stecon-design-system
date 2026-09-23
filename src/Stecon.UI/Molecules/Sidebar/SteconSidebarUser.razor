@@ -1,0 +1,22 @@
+@namespace Stecon.UI
+
+@if (UserContent is not null)
+{
+    <div class="stecon-sidebar-user @(Collapsed ? "stecon-sidebar-user--collapsed" : null)">
+        @UserContent
+    </div>
+}
+
+@code {
+    /// <summary>
+    /// Consumer-supplied user/profile content (e.g. <c>SteconAvatar</c> + name).
+    /// Stecon.UI owns placement/layout only - no user data model or account
+    /// menu/dropdown is defined here (see AGENTS.md - no business logic in
+    /// visual components).
+    /// </summary>
+    [Parameter]
+    public RenderFragment? UserContent { get; set; }
+
+    [Parameter]
+    public bool Collapsed { get; set; }
+}

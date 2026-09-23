@@ -1,0 +1,13 @@
+@namespace Stecon.UI
+
+<span class="stecon-badge stecon-badge--@Variant.ToString().ToLowerInvariant()">
+    @ChildContent
+</span>
+
+@code {
+    [Parameter]
+    public BadgeVariant Variant { get; set; } = BadgeVariant.Neutral;
+
+    [Parameter, EditorRequired]
+    public RenderFragment? ChildContent { get; set; }
+}

@@ -1,0 +1,144 @@
+.stecon-sidebar {
+    display: flex;
+    flex-direction: column;
+    width: 16rem;
+    height: 100%;
+    background-color: var(--stecon-surface-card);
+    border-right: 1px solid var(--stecon-border-default);
+    color: var(--stecon-text-primary);
+    font-family: var(--stecon-font-family);
+    transition: width var(--stecon-duration-normal) var(--stecon-ease-standard);
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.stecon-sidebar--collapsed {
+    width: 4.5rem;
+}
+
+.stecon-sidebar__nav {
+    flex: 1 1 auto;
+    margin: 0;
+    padding: var(--stecon-space-2) 0;
+    list-style: none;
+}
+
+.stecon-sidebar__collapse-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    margin: 0 var(--stecon-space-4) var(--stecon-space-2);
+    border: 1px solid var(--stecon-border-default);
+    border-radius: var(--stecon-radius-sm);
+    background: none;
+    color: var(--stecon-text-secondary);
+    cursor: pointer;
+}
+
+.stecon-sidebar__collapse-toggle:focus-visible {
+    outline: 2px solid var(--stecon-status-info);
+    outline-offset: 2px;
+}
+
+/* Compact: denser geometry; still supports expanded/collapsed (not permanently collapsed). */
+.stecon-sidebar--compact {
+    width: 13rem;
+}
+
+.stecon-sidebar--compact.stecon-sidebar--collapsed {
+    width: 4rem;
+}
+
+.stecon-sidebar--compact ::deep .stecon-sidebar-item__row {
+    padding: var(--stecon-space-1) var(--stecon-space-3);
+    font-size: var(--stecon-font-size-sm);
+}
+
+/* Floating: detached visual container - gutter, radius, Foundation shadow. */
+.stecon-sidebar--floating {
+    margin: var(--stecon-space-4);
+    height: calc(100% - (var(--stecon-space-4) * 2));
+    border: 1px solid var(--stecon-border-default);
+    border-radius: var(--stecon-radius-lg);
+    box-shadow: var(--stecon-shadow-md);
+}
+
+/* Minimal: reduced chrome - lightweight indicator instead of an active pill. */
+.stecon-sidebar--minimal ::deep .stecon-sidebar-item--active > .stecon-sidebar-item__row {
+    background-color: transparent;
+    border-radius: 0;
+    border-left: 3px solid var(--stecon-status-info);
+}
+
+.stecon-sidebar--minimal ::deep .stecon-sidebar-group__label {
+    display: none;
+}
+
+.stecon-sidebar-backdrop {
+    display: none;
+}
+
+/*
+  Tablet range (768px-1439.98px, the documented tablet/desktop breakpoint
+  tokens - no new breakpoint invented): presentation-only compact/icon-only
+  geometry by default, per the approved M1B contract. This does NOT mutate
+  the bound Collapsed value/CollapsedChanged - it is a pure CSS override on
+  top of whatever Collapsed currently is, so the component keeps a single
+  source of truth for Collapsed. The manual collapse toggle is hidden here
+  because at this range it would have no visible effect.
+*/
+@media (min-width: 768px) and (max-width: 1439.98px) {
+    .stecon-sidebar:not(.stecon-sidebar--mobile-open) {
+        width: 4.5rem;
+    }
+
+    .stecon-sidebar--compact:not(.stecon-sidebar--mobile-open) {
+        width: 4rem;
+    }
+
+    .stecon-sidebar:not(.stecon-sidebar--mobile-open) ::deep .stecon-sidebar-item__label,
+    .stecon-sidebar:not(.stecon-sidebar--mobile-open) ::deep .stecon-sidebar-item__chevron {
+        display: none;
+    }
+
+    .stecon-sidebar:not(.stecon-sidebar--mobile-open) ::deep .stecon-sidebar-item__row {
+        justify-content: center;
+    }
+
+    .stecon-sidebar:not(.stecon-sidebar--mobile-open) .stecon-sidebar__collapse-toggle {
+        display: none;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .stecon-sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 16rem;
+        z-index: var(--stecon-z-drawer);
+        transform: translateX(-100%);
+        visibility: hidden;
+        transition: transform var(--stecon-duration-normal) var(--stecon-ease-standard);
+    }
+
+    .stecon-sidebar--collapsed {
+        width: 16rem;
+    }
+
+    .stecon-sidebar--mobile-open {
+        transform: translateX(0);
+        visibility: visible;
+    }
+
+    .stecon-sidebar-backdrop {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background-color: rgb(0 0 0 / 0.4);
+        z-index: calc(var(--stecon-z-drawer) - 1);
+    }
+}

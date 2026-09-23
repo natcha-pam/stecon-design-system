@@ -1,0 +1,14 @@
+.stecon-sidebar-user {
+    display: flex;
+    align-items: center;
+    gap: var(--stecon-space-3);
+    padding: var(--stecon-space-4);
+    border-top: 1px solid var(--stecon-border-default);
+    overflow: hidden;
+}
+
+.stecon-sidebar-user--collapsed {
+    justify-content: center;
+    padding-left: var(--stecon-space-2);
+    padding-right: var(--stecon-space-2);
+}

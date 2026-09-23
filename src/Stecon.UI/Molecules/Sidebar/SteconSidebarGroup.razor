@@ -1,0 +1,35 @@
+@namespace Stecon.UI
+
+<li class="stecon-sidebar-group">
+    @if (!Collapsed && !string.IsNullOrWhiteSpace(GroupName))
+    {
+        <div class="stecon-sidebar-group__label">@GroupName</div>
+    }
+    <ul class="stecon-sidebar-group__items">
+        @foreach (var item in Items)
+        {
+            <SteconSidebarItem Item="item" Collapsed="Collapsed" Depth="0" SupportsNesting="false"
+                               ExpandedIds="ExpandedIds" OnToggleExpand="OnToggleExpand" OnNavigate="OnNavigate" />
+        }
+    </ul>
+</li>
+
+@code {
+    [Parameter]
+    public string? GroupName { get; set; }
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<SteconNavItem> Items { get; set; } = Array.Empty<SteconNavItem>();
+
+    [Parameter]
+    public bool Collapsed { get; set; }
+
+    [Parameter, EditorRequired]
+    public ISet<string> ExpandedIds { get; set; } = null!;
+
+    [Parameter]
+    public EventCallback<string> OnToggleExpand { get; set; }
+
+    [Parameter]
+    public EventCallback<SteconNavItem> OnNavigate { get; set; }
+}

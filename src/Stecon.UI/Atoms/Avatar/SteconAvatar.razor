@@ -1,0 +1,43 @@
+@namespace Stecon.UI
+
+<span class="stecon-avatar stecon-avatar--@Size.ToString().ToLowerInvariant()"
+      aria-label="@AltText" role="@(AltText is null ? null : "img")">
+    @if (!string.IsNullOrWhiteSpace(ImageUrl))
+    {
+        <img src="@ImageUrl" alt="" class="stecon-avatar__image" />
+    }
+    else
+    {
+        <span class="stecon-avatar__initials" aria-hidden="true">@Initials</span>
+    }
+</span>
+
+@code {
+    [Parameter]
+    public string? ImageUrl { get; set; }
+
+    /// <summary>Short text (e.g. initials) shown when no <see cref="ImageUrl"/> is supplied.</summary>
+    [Parameter]
+    public string? InitialsText { get; set; }
+
+    /// <summary>Accessible name for the avatar (e.g. the person's full name).</summary>
+    [Parameter]
+    public string? AltText { get; set; }
+
+    [Parameter]
+    public AvatarSize Size { get; set; } = AvatarSize.Md;
+
+    private string Initials
+    {
+        get
+        {
+            var text = InitialsText?.Trim();
+            if (string.IsNullOrEmpty(text))
+            {
+                return "?";
+            }
+
+            return text.Length <= 2 ? text.ToUpperInvariant() : text[..2].ToUpperInvariant();
+        }
+    }
+}

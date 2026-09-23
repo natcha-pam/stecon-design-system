@@ -1,0 +1,37 @@
+.stecon-app-layout {
+    display: flex;
+    min-height: 100vh;
+    background-color: var(--stecon-surface-page);
+    color: var(--stecon-text-primary);
+    font-family: var(--stecon-font-family);
+}
+
+.stecon-app-layout__sidebar {
+    flex-shrink: 0;
+}
+
+.stecon-app-layout__main {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.stecon-app-layout__header {
+    position: sticky;
+    top: 0;
+    z-index: var(--stecon-z-sticky);
+    background-color: var(--stecon-surface-card);
+    border-bottom: 1px solid var(--stecon-border-default);
+}
+
+.stecon-app-layout__content {
+    flex: 1 1 auto;
+    padding: var(--stecon-space-6);
+}
+
+@media (max-width: 767.98px) {
+    .stecon-app-layout__sidebar {
+        position: static;
+    }
+}

@@ -1,0 +1,93 @@
+@page "/sidebar-gallery"
+@inject IThemeService ThemeService
+@implements IDisposable
+
+@{
+    RenderFragment userContent = @<text>
+        <SteconAvatar InitialsText="JD" AltText="Jane Doe" />
+        <span>Jane Doe</span>
+    </text>;
+}
+
+<PageTitle>Sidebar Gallery</PageTitle>
+
+<h1>Sidebar Gallery</h1>
+<p>
+    Verify <code>SteconSidebar</code> across variants, states, and themes. The
+    switch to the mobile drawer presentation happens at the real browser
+    viewport width (&lt; 768px), not inside this page's controls - resize the
+    browser window to <strong>375px</strong>, <strong>768px</strong>, and
+    <strong>1440px</strong> to complete responsive verification.
+</p>
+
+<div class="stecon-gallery-controls">
+    <label>
+        Variant
+        <select @bind="_variant">
+            @foreach (var variant in Enum.GetValues<SidebarVariant>())
+            {
+                <option value="@variant">@variant</option>
+            }
+        </select>
+    </label>
+
+    <label>
+        Dataset
+        <select @bind="_dataset">
+            <option value="flat">Flat</option>
+            <option value="grouped">Grouped</option>
+            <option value="nested">Nested</option>
+        </select>
+    </label>
+
+    <label><input type="checkbox" @bind="_collapsed" /> Collapsed</label>
+    <label><input type="checkbox" @bind="_showBrand" /> Brand</label>
+    <label><input type="checkbox" @bind="_showUser" /> User area</label>
+
+    <button type="button" class="btn" @onclick="ToggleTheme">Theme: @ThemeService.Current</button>
+    <button type="button" class="btn btn-primary" @onclick="OpenMobileDrawer">Open mobile drawer</button>
+</div>
+
+<div class="stecon-gallery-preview">
+    <SteconSidebar Variant="_variant"
+                   Items="CurrentItems"
+                   @bind-Collapsed="_collapsed"
+                   BrandLogo="@(_showBrand ? "_content/Stecon.UI/brand/stecon-logo.jpg" : null)"
+                   BrandTitle="@(_showBrand ? "STECON" : null)"
+                   UserContent="@(_showUser ? userContent : null)"
+                   @bind-IsMobileOpen="_mobileOpen" />
+
+    <div class="stecon-gallery-preview__content">
+        <p>This box represents the main content region next to the sidebar.</p>
+    </div>
+</div>
+
+@code {
+    private SidebarVariant _variant = SidebarVariant.Workflow;
+    private string _dataset = "flat";
+    private bool _collapsed;
+    private bool _showBrand = true;
+    private bool _showUser = true;
+    private bool _mobileOpen;
+
+    private IReadOnlyList<SteconNavItem> CurrentItems => _dataset switch
+    {
+        "grouped" => DemoNavItems.Grouped,
+        "nested" => DemoNavItems.Nested,
+        _ => DemoNavItems.Flat,
+    };
+
+    private void ToggleTheme() =>
+        ThemeService.SetTheme(ThemeService.Current == ThemeMode.Light ? ThemeMode.Dark : ThemeMode.Light);
+
+    private void OpenMobileDrawer() => _mobileOpen = true;
+
+    protected override void OnInitialized()
+    {
+        ThemeService.ThemeChanged += OnThemeChanged;
+    }
+
+    private void OnThemeChanged(ThemeMode mode) => InvokeAsync(StateHasChanged);
+
+    public void Dispose() => ThemeService.ThemeChanged -= OnThemeChanged;
+}

@@ -1,0 +1,121 @@
+@namespace Stecon.UI
+@inject NavigationManager NavigationManager
+
+@{
+    RenderFragment icon = @<span class="stecon-sidebar-item__icon">
+        @if (Item.IconContent is not null)
+        {
+            @Item.IconContent
+        }
+        else if (Item.Icon is not null)
+        {
+            <SteconIcon Name="Item.Icon.Value" />
+        }
+    </span>;
+}
+
+<li class="stecon-sidebar-item @(IsActive ? "stecon-sidebar-item--active" : null) @(Item.Disabled ? "stecon-sidebar-item--disabled" : null)">
+    @if (Item.Disabled)
+    {
+        <span class="stecon-sidebar-item__row stecon-sidebar-item__link stecon-sidebar-item__link--disabled"
+              aria-disabled="true"
+              title="@Item.Label"
+              style="@IndentStyle">
+            @icon
+            <span class="stecon-sidebar-item__label">@Item.Label</span>
+            @if (!string.IsNullOrEmpty(Item.Badge))
+            {
+                <SteconBadge Variant="Item.BadgeVariant">@Item.Badge</SteconBadge>
+            }
+        </span>
+    }
+    else if (HasChildren && SupportsNesting)
+    {
+        <button type="button"
+                class="stecon-sidebar-item__row stecon-sidebar-item__toggle"
+                aria-expanded="@(IsExpanded ? "true" : "false")"
+                aria-controls="@ChildrenId"
+                title="@Item.Label"
+                style="@IndentStyle"
+                @onclick="ToggleExpand">
+            @icon
+            <span class="stecon-sidebar-item__label">@Item.Label</span>
+            @if (!string.IsNullOrEmpty(Item.Badge))
+            {
+                <SteconBadge Variant="Item.BadgeVariant">@Item.Badge</SteconBadge>
+            }
+            <span class="stecon-sidebar-item__chevron">
+                <SteconIcon Name="@(IsExpanded ? IconName.ChevronDown : IconName.ChevronRight)" />
+            </span>
+        </button>
+
+        @if (IsExpanded)
+        {
+            <ul id="@ChildrenId" class="stecon-sidebar-item__children">
+                @foreach (var child in Item.Children!)
+                {
+                    <SteconSidebarItem Item="child" Collapsed="Collapsed" Depth="Depth + 1"
+                                       SupportsNesting="true" ExpandedIds="ExpandedIds"
+                                       OnToggleExpand="OnToggleExpand" OnNavigate="OnNavigate" />
+                }
+            </ul>
+        }
+    }
+    else
+    {
+        <a class="stecon-sidebar-item__row stecon-sidebar-item__link"
+           href="@Item.Href"
+           title="@Item.Label"
+           aria-current="@(IsActive ? "page" : null)"
+           style="@IndentStyle"
+           @onclick="HandleNavigate">
+            @icon
+            <span class="stecon-sidebar-item__label">@Item.Label</span>
+            @if (!string.IsNullOrEmpty(Item.Badge))
+            {
+                <SteconBadge Variant="Item.BadgeVariant">@Item.Badge</SteconBadge>
+            }
+        </a>
+    }
+</li>
+
+@code {
+    [Parameter, EditorRequired]
+    public SteconNavItem Item { get; set; } = null!;
+
+    [Parameter]
+    public bool Collapsed { get; set; }
+
+    [Parameter]
+    public int Depth { get; set; }
+
+    /// <summary>Only <see cref="SidebarVariant.Nested"/> renders <see cref="SteconNavItem.Children"/>.</summary>
+    [Parameter]
+    public bool SupportsNesting { get; set; }
+
+    [Parameter, EditorRequired]
+    public ISet<string> ExpandedIds { get; set; } = null!;
+
+    [Parameter]
+    public EventCallback<string> OnToggleExpand { get; set; }
+
+    [Parameter]
+    public EventCallback<SteconNavItem> OnNavigate { get; set; }
+
+    private bool HasChildren => Item.Children is { Count: > 0 };
+
+    private bool IsExpanded => ExpandedIds.Contains(Item.Id);
+
+    private bool IsActive => SteconNavActivation.IsActive(Item, NavigationManager);
+
+    private string ChildrenId => $"stecon-sidebar-children-{Item.Id}";
+
+    private string IndentStyle => Depth > 0 ? $"padding-left: calc(var(--stecon-space-4) * {Depth + 1});" : string.Empty;
+
+    private Task ToggleExpand() => OnToggleExpand.InvokeAsync(Item.Id);
+
+    private async Task HandleNavigate()
+    {
+        await OnNavigate.InvokeAsync(Item);
+    }
+}

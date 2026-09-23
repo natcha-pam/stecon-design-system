@@ -1,0 +1,51 @@
+@namespace Stecon.UI
+
+<div class="stecon-app-layout">
+    @if (Sidebar is not null)
+    {
+        <div class="stecon-app-layout__sidebar">
+            @Sidebar
+        </div>
+    }
+
+    <div class="stecon-app-layout__main" inert="@IsMobileSidebarOpen">
+        @if (Header is not null)
+        {
+            <header class="stecon-app-layout__header">@Header</header>
+        }
+        <main class="stecon-app-layout__content">
+            @ChildContent
+        </main>
+    </div>
+</div>
+
+@code {
+    /// <summary>Typically a single <c>&lt;SteconSidebar&gt;</c>.</summary>
+    [Parameter]
+    public RenderFragment? Sidebar { get; set; }
+
+    /// <summary>
+    /// Optional top bar slot. Stecon.UI does not render a Topbar/menu-trigger
+    /// here - the consuming application owns any header content, including
+    /// the mobile menu-trigger button that toggles <see cref="IsMobileSidebarOpen"/>.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? Header { get; set; }
+
+    [Parameter, EditorRequired]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// When true, marks <c>.stecon-app-layout__main</c> <c>inert</c>, removing
+    /// all main-content controls from the tab order/accessibility tree while
+    /// the mobile sidebar drawer is open. This is what provides complete
+    /// background keyboard containment for the composed AppLayout scenario
+    /// (see <see cref="SteconSidebar.IsMobileOpen"/> for the standalone-usage
+    /// limitation this does not apply to).
+    /// </summary>
+    [Parameter]
+    public bool IsMobileSidebarOpen { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> IsMobileSidebarOpenChanged { get; set; }
+}

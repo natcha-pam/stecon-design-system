@@ -1,8 +1,9 @@
 /*
   Demo shell styling only - not part of the Stecon.UI public component API.
   Bootstrap has been removed (see AGENTS.md "no third-party UI frameworks").
-  These are minimal replacements for the default Blazor template shell
-  (App/MainLayout/NavMenu) and consume STECON foundation tokens only.
+  Navigation chrome now comes from SteconSidebar/SteconAppLayout; these rules
+  only cover the remaining demo scaffold pages (Home/Counter/Weather/Error)
+  and consume STECON foundation tokens only.
 */
 
 html, body {
@@ -18,48 +19,8 @@ a {
     color: var(--stecon-status-info);
 }
 
-.content {
-    padding-top: var(--stecon-space-4);
-}
-
 h1:focus {
     outline: none;
-}
-
-/* Minimal shell utilities replacing the removed Bootstrap classes used by
-   the default App/MainLayout/NavMenu scaffold. */
-.container-fluid {
-    width: 100%;
-    padding-left: var(--stecon-space-4);
-    padding-right: var(--stecon-space-4);
-}
-
-.navbar {
-    display: flex;
-    align-items: center;
-}
-
-.navbar-brand {
-    color: var(--stecon-brand-white);
-}
-
-.nav.flex-column {
-    display: flex;
-    flex-direction: column;
-}
-
-.px-3 {
-    padding-left: var(--stecon-space-3);
-    padding-right: var(--stecon-space-3);
-}
-
-.px-4 {
-    padding-left: var(--stecon-space-4);
-    padding-right: var(--stecon-space-4);
-}
-
-.ps-3 {
-    padding-left: var(--stecon-space-3);
 }
 
 .btn {

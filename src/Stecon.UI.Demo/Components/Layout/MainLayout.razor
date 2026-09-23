@@ -1,21 +1,26 @@
 ﻿@inherits LayoutComponentBase
 
 <SteconThemeProvider>
-    <div class="page">
-        <div class="sidebar">
-            <NavMenu />
-        </div>
-
-        <main>
-            <div class="top-row px-4">
+    <SteconAppLayout @bind-IsMobileSidebarOpen="_mobileOpen">
+        <Sidebar>
+            <SteconSidebar Variant="SidebarVariant.Workflow"
+                           Items="_navItems"
+                           BrandLogo="_content/Stecon.UI/brand/stecon-logo.jpg"
+                           BrandTitle="Stecon.UI.Demo"
+                           @bind-IsMobileOpen="_mobileOpen" />
+        </Sidebar>
+        <Header>
+            <div class="stecon-demo-header">
+                <button type="button" class="stecon-demo-menu-trigger" aria-label="Open navigation" @onclick="OpenMobileSidebar">
+                    <SteconIcon Name="IconName.Menu" />
+                </button>
                 <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
             </div>
-
-            <article class="content px-4">
-                @Body
-            </article>
-        </main>
-    </div>
+        </Header>
+        <ChildContent>
+            @Body
+        </ChildContent>
+    </SteconAppLayout>
 </SteconThemeProvider>
 
 <div id="blazor-error-ui" data-nosnippet>
@@ -23,3 +28,18 @@
     <a href="." class="reload">Reload</a>
     <span class="dismiss">🗙</span>
 </div>
+
+@code {
+    private bool _mobileOpen;
+
+    private static readonly IReadOnlyList<SteconNavItem> _navItems = new List<SteconNavItem>
+    {
+        new() { Id = "home", Label = "Home", Href = "", Match = NavLinkMatch.All, Icon = IconName.Home },
+        new() { Id = "counter", Label = "Counter", Href = "counter", Icon = IconName.ChevronRight },
+        new() { Id = "weather", Label = "Weather", Href = "weather", Icon = IconName.ChevronRight },
+        new() { Id = "foundation", Label = "Foundation", Href = "foundation", Icon = IconName.ChevronRight },
+        new() { Id = "sidebar-gallery", Label = "Sidebar Gallery", Href = "sidebar-gallery", Icon = IconName.ChevronRight },
+    };
+
+    private void OpenMobileSidebar() => _mobileOpen = true;
+}

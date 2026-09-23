@@ -1,0 +1,35 @@
+@namespace Stecon.UI
+
+@if (BrandContent is not null)
+{
+    <div class="stecon-sidebar-brand">@BrandContent</div>
+}
+else if (!string.IsNullOrWhiteSpace(LogoUrl) || !string.IsNullOrWhiteSpace(Title))
+{
+    <div class="stecon-sidebar-brand">
+        @if (!string.IsNullOrWhiteSpace(LogoUrl))
+        {
+            <img src="@LogoUrl" alt="@(Title ?? "Logo")" class="stecon-sidebar-brand__logo" />
+        }
+        @if (!Collapsed && !string.IsNullOrWhiteSpace(Title))
+        {
+            <span class="stecon-sidebar-brand__title">@Title</span>
+        }
+    </div>
+}
+
+@code {
+    /// <summary>Path to a logo image, e.g. the unmodified STECON brand asset.</summary>
+    [Parameter]
+    public string? LogoUrl { get; set; }
+
+    [Parameter]
+    public string? Title { get; set; }
+
+    /// <summary>Full override. Takes precedence over <see cref="LogoUrl"/>/<see cref="Title"/>.</summary>
+    [Parameter]
+    public RenderFragment? BrandContent { get; set; }
+
+    [Parameter]
+    public bool Collapsed { get; set; }
+}

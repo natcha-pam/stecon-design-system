@@ -1,0 +1,19 @@
+.stecon-sidebar-group {
+    list-style: none;
+    margin-bottom: var(--stecon-space-2);
+}
+
+.stecon-sidebar-group__label {
+    padding: var(--stecon-space-2) var(--stecon-space-4);
+    font-size: var(--stecon-font-size-xs);
+    font-weight: var(--stecon-font-weight-semibold);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--stecon-text-secondary);
+}
+
+.stecon-sidebar-group__items {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}

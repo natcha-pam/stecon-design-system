@@ -1,0 +1,203 @@
+@namespace Stecon.UI
+@implements IDisposable
+@inject NavigationManager NavigationManager
+
+@if (IsMobileOpen)
+{
+    <div class="stecon-sidebar-backdrop" @onclick="CloseMobile"></div>
+}
+
+<nav @ref="_navRef"
+     tabindex="-1"
+     class="stecon-sidebar stecon-sidebar--@VariantClass @(Collapsed ? "stecon-sidebar--collapsed" : null) @(IsMobileOpen ? "stecon-sidebar--mobile-open" : null)"
+     aria-label="@AriaLabel"
+     @onkeydown="HandleKeyDown">
+
+    <SteconSidebarBrand LogoUrl="@BrandLogo" Title="@BrandTitle" BrandContent="@BrandContent" Collapsed="Collapsed" />
+
+    @if (Collapsible)
+    {
+        <button type="button" class="stecon-sidebar__collapse-toggle"
+                aria-label="@(Collapsed ? "Expand sidebar" : "Collapse sidebar")"
+                @onclick="ToggleCollapsed">
+            <SteconIcon Name="@(Collapsed ? IconName.ChevronRight : IconName.ChevronDown)" />
+        </button>
+    }
+
+    <ul class="stecon-sidebar__nav">
+        @if (Variant == SidebarVariant.Grouped)
+        {
+            @foreach (var group in GroupedItems)
+            {
+                <SteconSidebarGroup GroupName="@group.Name" Items="group.Items" Collapsed="Collapsed"
+                                    ExpandedIds="_expandedIds" OnToggleExpand="ToggleExpand" OnNavigate="HandleItemNavigate" />
+            }
+        }
+        else
+        {
+            @foreach (var item in Items)
+            {
+                <SteconSidebarItem Item="item" Collapsed="Collapsed" Depth="0"
+                                   SupportsNesting="@(Variant == SidebarVariant.Nested)"
+                                   ExpandedIds="_expandedIds" OnToggleExpand="ToggleExpand" OnNavigate="HandleItemNavigate" />
+            }
+        }
+    </ul>
+
+    <SteconSidebarUser UserContent="@UserContent" Collapsed="Collapsed" />
+</nav>
+
+@code {
+    [Parameter]
+    public SidebarVariant Variant { get; set; } = SidebarVariant.Workflow;
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<SteconNavItem> Items { get; set; } = Array.Empty<SteconNavItem>();
+
+    [Parameter]
+    public bool Collapsible { get; set; } = true;
+
+    [Parameter]
+    public bool Collapsed { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> CollapsedChanged { get; set; }
+
+    [Parameter]
+    public string? BrandLogo { get; set; }
+
+    [Parameter]
+    public string? BrandTitle { get; set; }
+
+    [Parameter]
+    public RenderFragment? BrandContent { get; set; }
+
+    /// <summary>Consumer-supplied footer content, e.g. <c>SteconAvatar</c> + name. No user data model is defined.</summary>
+    [Parameter]
+    public RenderFragment? UserContent { get; set; }
+
+    /// <summary>
+    /// Mobile drawer open state (&lt;768px). When open, initial focus moves
+    /// into this &lt;nav&gt;, and Escape/backdrop-click close it. This alone
+    /// does NOT trap Tab within the drawer - full keyboard containment
+    /// (Tab cannot reach background content) is only guaranteed when this
+    /// component is composed inside <see cref="SteconAppLayout"/>, which
+    /// marks the surrounding main content <c>inert</c>. Used standalone
+    /// (e.g. the Sidebar Gallery, outside an AppLayout), Tab can still reach
+    /// sibling page content, since Stecon.UI cannot safely mark unknown
+    /// consumer-owned DOM inert from inside this component.
+    /// </summary>
+    [Parameter]
+    public bool IsMobileOpen { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> IsMobileOpenChanged { get; set; }
+
+    /// <summary>Fired when a navigable item (non-null Href) is activated.</summary>
+    [Parameter]
+    public EventCallback<SteconNavItem> OnNavigate { get; set; }
+
+    [Parameter]
+    public string AriaLabel { get; set; } = "Primary";
+
+    private readonly HashSet<string> _expandedIds = new();
+    private ElementReference _navRef;
+    private bool _wasMobileOpen;
+    private bool _shouldFocusOnRender;
+
+    private string VariantClass => Variant.ToString().ToLowerInvariant();
+
+    private IEnumerable<(string? Name, List<SteconNavItem> Items)> GroupedItems =>
+        Items.GroupBy(i => i.Group).Select(g => (g.Key, g.ToList()));
+
+    protected override void OnInitialized()
+    {
+        NavigationManager.LocationChanged += HandleLocationChanged;
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (Variant == SidebarVariant.Nested)
+        {
+            SeedExpandedAncestors(Items);
+        }
+
+        if (IsMobileOpen && !_wasMobileOpen)
+        {
+            _shouldFocusOnRender = true;
+        }
+
+        _wasMobileOpen = IsMobileOpen;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_shouldFocusOnRender)
+        {
+            _shouldFocusOnRender = false;
+            await _navRef.FocusAsync();
+        }
+    }
+
+    private void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        if (Variant == SidebarVariant.Nested)
+        {
+            SeedExpandedAncestors(Items);
+        }
+
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void SeedExpandedAncestors(IReadOnlyList<SteconNavItem> items)
+    {
+        foreach (var item in items)
+        {
+            if (item.Children is { Count: > 0 } children && SteconNavActivation.ContainsActiveDescendant(item, NavigationManager))
+            {
+                _expandedIds.Add(item.Id);
+                SeedExpandedAncestors(children);
+            }
+        }
+    }
+
+    private Task ToggleCollapsed() => CollapsedChanged.InvokeAsync(!Collapsed);
+
+    private Task ToggleExpand(string id)
+    {
+        if (!_expandedIds.Remove(id))
+        {
+            _expandedIds.Add(id);
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private Task CloseMobile() => IsMobileOpenChanged.InvokeAsync(false);
+
+    private async Task HandleItemNavigate(SteconNavItem item)
+    {
+        await OnNavigate.InvokeAsync(item);
+
+        if (IsMobileOpen && !string.IsNullOrEmpty(item.Href))
+        {
+            await IsMobileOpenChanged.InvokeAsync(false);
+        }
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        // Escape-to-close and initial FocusAsync() (OnAfterRenderAsync below) are
+        // implemented without JavaScript. They do not by themselves constitute a
+        // full Tab focus trap - see the IsMobileOpen doc comment above.
+        if (e.Key == "Escape" && IsMobileOpen)
+        {
+            await CloseMobile();
+        }
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= HandleLocationChanged;
+    }
+}
