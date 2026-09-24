@@ -1,0 +1,43 @@
+.stecon-toast {
+    box-sizing: border-box;
+    display: flex;
+    align-items: flex-start;
+    gap: var(--stecon-space-3);
+    width: min(90vw, 22rem);
+    padding: var(--stecon-space-3) var(--stecon-space-4);
+    border-radius: var(--stecon-radius-md);
+    border: 1px solid var(--stecon-border-default);
+    background-color: var(--stecon-surface-card);
+    box-shadow: var(--stecon-shadow-md);
+}
+
+.stecon-toast__icon {
+    display: inline-flex;
+    flex-shrink: 0;
+    width: 1.1rem;
+    height: 1.1rem;
+    margin-top: 0.1rem;
+}
+
+.stecon-toast__message {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: var(--stecon-font-size-sm);
+    color: var(--stecon-text-primary);
+}
+
+.stecon-toast--info .stecon-toast__icon {
+    color: var(--stecon-status-info);
+}
+
+.stecon-toast--success .stecon-toast__icon {
+    color: var(--stecon-status-success);
+}
+
+.stecon-toast--warning .stecon-toast__icon {
+    color: var(--stecon-status-warning);
+}
+
+.stecon-toast--danger .stecon-toast__icon {
+    color: var(--stecon-status-danger);
+}

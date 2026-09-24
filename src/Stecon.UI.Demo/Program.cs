@@ -7,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddSteconTheme();
+builder.Services.AddSteconToast();
 
 var app = builder.Build();
 

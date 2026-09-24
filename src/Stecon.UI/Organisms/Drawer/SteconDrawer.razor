@@ -1,0 +1,173 @@
+@namespace Stecon.UI
+@implements IAsyncDisposable
+
+<dialog @ref="_dialogRef"
+        class="@CssClass"
+        role="dialog"
+        aria-labelledby="@(_hasTitleText ? _titleId : null)"
+        aria-label="@(_hasTitleText ? null : AccessibleLabel)"
+        @attributes="SplatAttributes">
+    <div class="stecon-drawer__panel">
+        <header class="stecon-drawer__header">
+            <div class="stecon-drawer__header-content">
+                @if (HeaderContent is not null)
+                {
+                    @HeaderContent
+                }
+                else if (!string.IsNullOrWhiteSpace(Title))
+                {
+                    <h2 class="stecon-drawer__title" id="@_titleId">@Title</h2>
+                }
+            </div>
+            @if (ShowCloseButton)
+            {
+                <SteconIconButton Variant="ButtonVariant.Ghost" Size="ControlSize.Sm" Icon="IconName.Close"
+                                  AccessibleLabel="@CloseButtonLabel" OnClick="HandleCloseButtonClickAsync" />
+            }
+        </header>
+        <div class="stecon-drawer__body">
+            @ChildContent
+        </div>
+        @if (FooterContent is not null)
+        {
+            <footer class="stecon-drawer__footer">@FooterContent</footer>
+        }
+    </div>
+</dialog>
+
+@code {
+    [Parameter]
+    public bool IsOpen { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> IsOpenChanged { get; set; }
+
+    [Parameter]
+    public string? Title { get; set; }
+
+    [Parameter]
+    public RenderFragment? HeaderContent { get; set; }
+
+    [Parameter, EditorRequired]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public RenderFragment? FooterContent { get; set; }
+
+    [Parameter]
+    public DrawerPlacement Placement { get; set; } = DrawerPlacement.Right;
+
+    [Parameter]
+    public DrawerSize Size { get; set; } = DrawerSize.Md;
+
+    [Parameter]
+    public bool CloseOnBackdrop { get; set; } = true;
+
+    [Parameter]
+    public bool CloseOnEscape { get; set; } = true;
+
+    [Parameter]
+    public bool ShowCloseButton { get; set; } = true;
+
+    [Parameter]
+    public string CloseButtonLabel { get; set; } = "Close";
+
+    [Parameter]
+    public string? AccessibleLabel { get; set; }
+
+    [Parameter]
+    public EventCallback<OverlayCloseReason> OnClose { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
+
+    [Inject]
+    private IJSRuntime JsRuntime { get; set; } = default!;
+
+    private ElementReference _dialogRef;
+    private SteconOverlayInterop? _interop;
+    private DotNetObjectReference<SteconDrawer>? _selfRef;
+    private bool _wasOpen;
+
+    private readonly string _titleId = $"stecon-drawer-title-{Guid.NewGuid():N}";
+
+    private bool _hasTitleText => HeaderContent is null && !string.IsNullOrWhiteSpace(Title);
+
+    private string PlacementClass => Placement.ToString().ToLowerInvariant();
+
+    private string SizeClass => Size.ToString().ToLowerInvariant();
+
+    private string CssClass => CssClassMerge.Combine($"stecon-drawer stecon-drawer--{PlacementClass} stecon-drawer--{SizeClass}", AdditionalAttributes);
+
+    private IReadOnlyDictionary<string, object>? SplatAttributes => CssClassMerge.AttributesWithoutClass(AdditionalAttributes);
+
+    private SteconOverlayInterop Interop => _interop ??= new SteconOverlayInterop(JsRuntime);
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (IsOpen == _wasOpen)
+        {
+            return;
+        }
+
+        _wasOpen = IsOpen;
+
+        if (IsOpen)
+        {
+            _selfRef ??= DotNetObjectReference.Create(this);
+            // exclusiveModal:false - a Drawer never blocks, and is never blocked by, a Modal.
+            await Interop.ShowOverlayAsync(_dialogRef, _selfRef, exclusiveModal: false, CloseOnEscape, CloseOnBackdrop);
+        }
+        else
+        {
+            await Interop.CloseOverlayAsync(_dialogRef);
+        }
+    }
+
+    [JSInvokable]
+    public async Task OnNativeCloseAsync(string reason)
+    {
+        var closeReason = reason switch
+        {
+            "Escape" => OverlayCloseReason.Escape,
+            "Backdrop" => OverlayCloseReason.Backdrop,
+            _ => OverlayCloseReason.Programmatic,
+        };
+
+        _wasOpen = false;
+        IsOpen = false;
+        await Interop.CloseOverlayAsync(_dialogRef); // backdrop clicks never auto-close natively; Escape's native auto-close cannot be relied upon across all browsers
+        await IsOpenChanged.InvokeAsync(false);
+        await OnClose.InvokeAsync(closeReason);
+        StateHasChanged();
+    }
+
+    private async Task HandleCloseButtonClickAsync()
+    {
+        _wasOpen = false;
+        IsOpen = false;
+        await Interop.CloseOverlayAsync(_dialogRef);
+        await IsOpenChanged.InvokeAsync(false);
+        await OnClose.InvokeAsync(OverlayCloseReason.CloseButton);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        try
+        {
+            if (_interop is not null)
+            {
+                await _interop.DisposeOverlayAsync(_dialogRef);
+                await _interop.DisposeAsync();
+            }
+        }
+        catch (JSDisconnectedException)
+        {
+            // Circuit already gone - nothing to clean up client-side.
+        }
+        finally
+        {
+            _selfRef?.Dispose();
+        }
+    }
+}

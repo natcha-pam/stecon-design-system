@@ -41,4 +41,9 @@
   --stecon-interactive-disabled: #c3cdf0;
   --stecon-on-interactive: #ffffff;
   --stecon-focus-ring: #1d4ed8;
+
+  /* Overlay (M1D) - scrim behind Modal/Drawer. Reported as a genuinely missing
+     semantic token during M1D inspection (no existing token models a
+     translucent backdrop). */
+  --stecon-overlay-backdrop: rgba(15, 23, 42, 0.5);
 }

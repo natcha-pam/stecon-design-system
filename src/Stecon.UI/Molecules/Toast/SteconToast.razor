@@ -1,0 +1,37 @@
+@namespace Stecon.UI
+
+<div class="stecon-toast stecon-toast--@VariantClass">
+    <span class="stecon-toast__icon" aria-hidden="true">
+        <SteconIcon Name="DefaultIcon" />
+    </span>
+    <div class="stecon-toast__message">@Message.Message</div>
+    @if (Message.Dismissible)
+    {
+        <SteconIconButton Variant="ButtonVariant.Ghost" Size="ControlSize.Sm" Icon="IconName.Close"
+                           AccessibleLabel="@DismissLabel" OnClick="HandleDismissAsync" />
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public ToastMessage Message { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback<string> OnDismiss { get; set; }
+
+    /// <summary>Accessible name for the dismiss button. Structural chrome text, not business content.</summary>
+    [Parameter]
+    public string DismissLabel { get; set; } = "Dismiss";
+
+    private string VariantClass => Message.Variant.ToString().ToLowerInvariant();
+
+    private IconName DefaultIcon => Message.Variant switch
+    {
+        ToastVariant.Success => IconName.CheckCircle,
+        ToastVariant.Warning => IconName.ExclamationTriangle,
+        ToastVariant.Danger => IconName.XCircle,
+        _ => IconName.InfoCircle,
+    };
+
+    private Task HandleDismissAsync() => OnDismiss.InvokeAsync(Message.Id);
+}

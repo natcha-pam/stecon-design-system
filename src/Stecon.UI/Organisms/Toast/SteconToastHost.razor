@@ -1,0 +1,102 @@
+@namespace Stecon.UI
+@implements IAsyncDisposable
+
+<div @ref="_hostRef" class="stecon-toast-host stecon-toast-host--@PositionClass" popover="manual">
+    <div class="stecon-toast-host__list" role="status" aria-live="polite" aria-atomic="false">
+        @foreach (var toast in ToastService.Toasts)
+        {
+            <SteconToast @key="toast.Id" Message="toast" OnDismiss="HandleDismissAsync" />
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public ToastPosition Position { get; set; } = ToastPosition.BottomRight;
+
+    /// <summary>Default 5 - when exceeded the oldest visible toast is removed (no queue, no dedup).</summary>
+    [Parameter]
+    public int MaxVisible { get; set; } = 5;
+
+    [Inject]
+    private IToastService ToastService { get; set; } = default!;
+
+    [Inject]
+    private IJSRuntime JsRuntime { get; set; } = default!;
+
+    private ElementReference _hostRef;
+    private SteconOverlayInterop? _interop;
+
+    private string PositionClass => Position switch
+    {
+        ToastPosition.TopRight => "top-right",
+        ToastPosition.TopLeft => "top-left",
+        ToastPosition.TopCenter => "top-center",
+        ToastPosition.BottomLeft => "bottom-left",
+        ToastPosition.BottomCenter => "bottom-center",
+        _ => "bottom-right",
+    };
+
+    private SteconOverlayInterop Interop => _interop ??= new SteconOverlayInterop(JsRuntime);
+
+    protected override void OnInitialized()
+    {
+        ToastService.ToastsChanged += HandleToastsChanged;
+        EnforceMaxVisible(); // covers toasts already present before this host mounted
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // "manual" popover - joins the top layer (renders above an open Modal) without
+            // ever stealing focus or making the background inert (native popover behavior).
+            await Interop.ShowPopoverHostAsync(_hostRef);
+        }
+    }
+
+    private void HandleToastsChanged()
+    {
+        EnforceMaxVisible();
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void EnforceMaxVisible()
+    {
+        var toasts = ToastService.Toasts;
+        var excess = toasts.Count - MaxVisible;
+        if (excess <= 0)
+        {
+            return;
+        }
+
+        foreach (var toast in toasts.Take(excess))
+        {
+            ToastService.Dismiss(toast.Id);
+        }
+    }
+
+    private Task HandleDismissAsync(string id)
+    {
+        ToastService.Dismiss(id);
+        return Task.CompletedTask;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        ToastService.ToastsChanged -= HandleToastsChanged;
+
+        try
+        {
+            if (_interop is not null)
+            {
+                await _interop.HidePopoverHostAsync(_hostRef);
+                await _interop.DisposeAsync();
+            }
+        }
+        catch (JSDisconnectedException)
+        {
+            // Circuit already gone - nothing to clean up client-side.
+        }
+    }
+}

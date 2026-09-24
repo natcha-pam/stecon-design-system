@@ -25,4 +25,17 @@ public class SteconIconTests : BunitContext
         Assert.Equal("img", svg.GetAttribute("role"));
         Assert.Equal("Open navigation", cut.Find("title").TextContent);
     }
+
+    [Theory]
+    [InlineData(IconName.InfoCircle)]
+    [InlineData(IconName.CheckCircle)]
+    [InlineData(IconName.ExclamationTriangle)]
+    [InlineData(IconName.XCircle)]
+    public void RendersNewStatusIcons_WithoutError(IconName name)
+    {
+        var cut = Render<SteconIcon>(p => p.Add(x => x.Name, name));
+
+        var svg = cut.Find("svg.stecon-icon");
+        Assert.NotEmpty(svg.Children);
+    }
 }

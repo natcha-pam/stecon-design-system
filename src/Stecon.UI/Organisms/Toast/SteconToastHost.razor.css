@@ -1,0 +1,57 @@
+.stecon-toast-host {
+    position: fixed;
+    inset: 0;
+    box-sizing: border-box;
+    margin: 0;
+    padding: var(--stecon-space-4);
+    border: none;
+    background: transparent;
+    overflow: visible;
+    pointer-events: none;
+}
+
+.stecon-toast-host__list {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    gap: var(--stecon-space-2);
+    pointer-events: auto;
+}
+
+.stecon-toast-host--top-right .stecon-toast-host__list {
+    top: var(--stecon-space-4);
+    right: var(--stecon-space-4);
+    align-items: flex-end;
+}
+
+.stecon-toast-host--top-left .stecon-toast-host__list {
+    top: var(--stecon-space-4);
+    left: var(--stecon-space-4);
+    align-items: flex-start;
+}
+
+.stecon-toast-host--top-center .stecon-toast-host__list {
+    top: var(--stecon-space-4);
+    left: 50%;
+    transform: translateX(-50%);
+    align-items: center;
+}
+
+.stecon-toast-host--bottom-right .stecon-toast-host__list {
+    bottom: var(--stecon-space-4);
+    right: var(--stecon-space-4);
+    align-items: flex-end;
+}
+
+.stecon-toast-host--bottom-left .stecon-toast-host__list {
+    bottom: var(--stecon-space-4);
+    left: var(--stecon-space-4);
+    align-items: flex-start;
+}
+
+.stecon-toast-host--bottom-center .stecon-toast-host__list {
+    bottom: var(--stecon-space-4);
+    left: 50%;
+    transform: translateX(-50%);
+    align-items: center;
+}

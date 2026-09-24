@@ -1,0 +1,36 @@
+/*
+  Gallery-only playground styling - not part of the Stecon.UI public
+  component API.
+*/
+
+.stecon-overlay-gallery-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: var(--stecon-space-4);
+}
+
+.stecon-overlay-gallery-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--stecon-space-3);
+    padding: var(--stecon-space-4);
+    margin-bottom: var(--stecon-space-6);
+    background-color: var(--stecon-surface-card);
+    border: 1px solid var(--stecon-border-default);
+    border-radius: var(--stecon-radius-md);
+}
+
+.stecon-overlay-gallery-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--stecon-space-3);
+    min-width: 0;
+}
+
+.stecon-overlay-gallery-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--stecon-space-3);
+    min-width: 0;
+}

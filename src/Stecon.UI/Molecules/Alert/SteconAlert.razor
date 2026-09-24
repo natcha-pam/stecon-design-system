@@ -1,0 +1,94 @@
+@namespace Stecon.UI
+
+<div class="@CssClass" role="@RoleAttribute" aria-live="@AriaLiveAttribute" @attributes="SplatAttributes">
+    @if (ShowIcon)
+    {
+        <span class="stecon-alert__icon" aria-hidden="true">
+            @if (IconContent is not null)
+            {
+                @IconContent
+            }
+            else
+            {
+                <SteconIcon Name="DefaultIcon" />
+            }
+        </span>
+    }
+    <div class="stecon-alert__content">
+        @if (!string.IsNullOrWhiteSpace(Title))
+        {
+            <p class="stecon-alert__title">@Title</p>
+        }
+        <div class="stecon-alert__message">@ChildContent</div>
+    </div>
+    @if (Dismissible)
+    {
+        <SteconIconButton Variant="ButtonVariant.Ghost" Size="ControlSize.Sm" Icon="IconName.Close"
+                           AccessibleLabel="@DismissLabel" OnClick="HandleDismissAsync" />
+    }
+</div>
+
+@code {
+    [Parameter]
+    public AlertVariant Variant { get; set; } = AlertVariant.Info;
+
+    [Parameter]
+    public string? Title { get; set; }
+
+    [Parameter, EditorRequired]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public bool ShowIcon { get; set; } = true;
+
+    /// <summary>Overrides the default per-variant icon when supplied.</summary>
+    [Parameter]
+    public RenderFragment? IconContent { get; set; }
+
+    [Parameter]
+    public bool Dismissible { get; set; }
+
+    /// <summary>Accessible name for the dismiss button. Structural chrome text, not business content.</summary>
+    [Parameter]
+    public string DismissLabel { get; set; } = "Dismiss";
+
+    [Parameter]
+    public EventCallback OnDismiss { get; set; }
+
+    /// <summary>Off by default (static content). Set Polite/Assertive only when this Alert is dynamically injected as a live announcement.</summary>
+    [Parameter]
+    public AlertLive Live { get; set; } = AlertLive.Off;
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string VariantClass => Variant.ToString().ToLowerInvariant();
+
+    private string CssClass => CssClassMerge.Combine($"stecon-alert stecon-alert--{VariantClass}", AdditionalAttributes);
+
+    private IReadOnlyDictionary<string, object>? SplatAttributes => CssClassMerge.AttributesWithoutClass(AdditionalAttributes);
+
+    private IconName DefaultIcon => Variant switch
+    {
+        AlertVariant.Success => IconName.CheckCircle,
+        AlertVariant.Warning => IconName.ExclamationTriangle,
+        AlertVariant.Danger => IconName.XCircle,
+        _ => IconName.InfoCircle,
+    };
+
+    private string? RoleAttribute => Live switch
+    {
+        AlertLive.Polite => "status",
+        AlertLive.Assertive => "alert",
+        _ => null,
+    };
+
+    private string? AriaLiveAttribute => Live switch
+    {
+        AlertLive.Polite => "polite",
+        AlertLive.Assertive => "assertive",
+        _ => null,
+    };
+
+    private Task HandleDismissAsync() => OnDismiss.InvokeAsync();
+}

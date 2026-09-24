@@ -1,0 +1,268 @@
+@page "/overlay-feedback-gallery"
+@inject IThemeService ThemeService
+@inject IToastService ToastService
+@implements IDisposable
+
+<PageTitle>Overlay &amp; Feedback Gallery</PageTitle>
+
+<h1>Overlay &amp; Feedback Gallery</h1>
+<p>
+    Verify Alert, Modal, Drawer, Confirm, and Toast across states and themes.
+    Resize the browser to <strong>375px</strong>, <strong>768px</strong>, and
+    <strong>1440px</strong>, and toggle the theme below to verify Light/Dark.
+</p>
+
+<div class="stecon-overlay-gallery-toolbar">
+    <SteconButton Variant="ButtonVariant.Secondary" OnClick="ToggleTheme">
+        Theme: @ThemeService.Current
+    </SteconButton>
+</div>
+
+<section class="stecon-overlay-gallery-section">
+    <h2>Alert</h2>
+    <div class="stecon-overlay-gallery-stack">
+        <SteconAlert Variant="AlertVariant.Info" Title="Info">This is an informational alert.</SteconAlert>
+        <SteconAlert Variant="AlertVariant.Success" Title="Success">Saved successfully.</SteconAlert>
+        <SteconAlert Variant="AlertVariant.Warning" Title="Warning">Please review before continuing.</SteconAlert>
+        <SteconAlert Variant="AlertVariant.Danger" Title="Danger" Dismissible="true" OnDismiss="HandleAlertDismissed">
+            Something went wrong and this alert can be dismissed.
+        </SteconAlert>
+        @if (_alertDismissed)
+        {
+            <SteconAlert Variant="AlertVariant.Info">The alert above was dismissed.</SteconAlert>
+        }
+        <SteconAlert Variant="AlertVariant.Info" Title="ภาษาไทย">
+            ข้อความแจ้งเตือนภาษาไทยที่ค่อนข้างยาวมากเพื่อทดสอบการตัดคำและการขึ้นบรรทัดใหม่อย่างปลอดภัยในทุกขนาดหน้าจอ / A long bilingual message to verify safe wrapping at every viewport width.
+        </SteconAlert>
+    </div>
+</section>
+
+<section class="stecon-overlay-gallery-section">
+    <h2>Modal</h2>
+    <div class="stecon-overlay-gallery-row">
+        <SteconButton OnClick="@(() => _smallModalOpen = true)">Small</SteconButton>
+        <SteconButton OnClick="@(() => _mediumModalOpen = true)">Medium</SteconButton>
+        <SteconButton OnClick="@(() => _largeModalOpen = true)">Large</SteconButton>
+        <SteconButton OnClick="@(() => _xlModalOpen = true)">Extra large</SteconButton>
+        <SteconButton OnClick="@(() => _fullscreenModalOpen = true)">Fullscreen</SteconButton>
+        <SteconButton OnClick="@(() => _tallModalOpen = true)">Tall/scrolling content</SteconButton>
+        <SteconButton OnClick="@(() => _formModalOpen = true)">Form content (M1C)</SteconButton>
+    </div>
+
+    <SteconModal @bind-IsOpen="_smallModalOpen" Title="Small modal" Size="ModalSize.Sm">
+        <ChildContent><p>Simple small modal content.</p></ChildContent>
+        <FooterContent><SteconButton OnClick="@(() => _smallModalOpen = false)">Close</SteconButton></FooterContent>
+    </SteconModal>
+
+    <SteconModal @bind-IsOpen="_mediumModalOpen" Title="Medium modal" Size="ModalSize.Md">
+        <ChildContent><p>Simple medium modal content.</p></ChildContent>
+        <FooterContent><SteconButton OnClick="@(() => _mediumModalOpen = false)">Close</SteconButton></FooterContent>
+    </SteconModal>
+
+    <SteconModal @bind-IsOpen="_largeModalOpen" Title="Large modal" Size="ModalSize.Lg">
+        <ChildContent><p>Simple large modal content.</p></ChildContent>
+        <FooterContent><SteconButton OnClick="@(() => _largeModalOpen = false)">Close</SteconButton></FooterContent>
+    </SteconModal>
+
+    <SteconModal @bind-IsOpen="_xlModalOpen" Title="Extra large modal" Size="ModalSize.Xl">
+        <ChildContent><p>Simple extra-large modal content.</p></ChildContent>
+        <FooterContent><SteconButton OnClick="@(() => _xlModalOpen = false)">Close</SteconButton></FooterContent>
+    </SteconModal>
+
+    <SteconModal @bind-IsOpen="_fullscreenModalOpen" Title="Fullscreen modal" Size="ModalSize.Fullscreen">
+        <ChildContent><p>Fullscreen modal content - useful on mobile.</p></ChildContent>
+        <FooterContent><SteconButton OnClick="@(() => _fullscreenModalOpen = false)">Close</SteconButton></FooterContent>
+    </SteconModal>
+
+    <SteconModal @bind-IsOpen="_tallModalOpen" Title="Tall content">
+        <ChildContent>
+            @for (var i = 1; i <= 30; i++)
+            {
+                <p>Line @i - the body scrolls internally while the header and footer stay in place.</p>
+            }
+        </ChildContent>
+        <FooterContent>
+            <SteconButton Variant="ButtonVariant.Secondary" OnClick="@(() => _tallModalOpen = false)">Cancel</SteconButton>
+            <SteconButton Variant="ButtonVariant.Primary" OnClick="@(() => _tallModalOpen = false)">Save</SteconButton>
+        </FooterContent>
+    </SteconModal>
+
+    <SteconModal @bind-IsOpen="_formModalOpen" Title="Edit profile">
+        <ChildContent>
+            <SteconFormField Label="Name" Required="true">
+                <ChildContent Context="ctx">
+                    <SteconInput @bind-Value="_formName" DescribedBy="@ctx.DescribedBy" />
+                </ChildContent>
+            </SteconFormField>
+            <SteconFormField Label="Role">
+                <ChildContent Context="ctx">
+                    <SteconSelect TValue="string" @bind-Value="_formRole" DescribedBy="@ctx.DescribedBy">
+                        <option value="engineer">Engineer</option>
+                        <option value="manager">Manager</option>
+                    </SteconSelect>
+                </ChildContent>
+            </SteconFormField>
+        </ChildContent>
+        <FooterContent>
+            <SteconButton Variant="ButtonVariant.Secondary" OnClick="@(() => _formModalOpen = false)">Cancel</SteconButton>
+            <SteconButton Variant="ButtonVariant.Primary" OnClick="@(() => _formModalOpen = false)">Save</SteconButton>
+        </FooterContent>
+    </SteconModal>
+</section>
+
+<section class="stecon-overlay-gallery-section">
+    <h2>Drawer</h2>
+    <div class="stecon-overlay-gallery-row">
+        <SteconButton OnClick="@(() => _leftDrawerOpen = true)">Open left (filters)</SteconButton>
+        <SteconButton OnClick="@(() => _rightDrawerOpen = true)">Open right (form)</SteconButton>
+    </div>
+
+    <SteconDrawer @bind-IsOpen="_leftDrawerOpen" Title="Filters" Placement="DrawerPlacement.Left">
+        <ChildContent>
+            <SteconCheckbox @bind-Value="_filterActive">Active only</SteconCheckbox>
+            <SteconCheckbox @bind-Value="_filterOverdue">Overdue only</SteconCheckbox>
+        </ChildContent>
+        <FooterContent>
+            <SteconButton Variant="ButtonVariant.Secondary" OnClick="@(() => _leftDrawerOpen = false)">Close</SteconButton>
+            <SteconButton Variant="ButtonVariant.Primary" OnClick="@(() => _leftDrawerOpen = false)">Apply</SteconButton>
+        </FooterContent>
+    </SteconDrawer>
+
+    <SteconDrawer @bind-IsOpen="_rightDrawerOpen" Title="New request" Placement="DrawerPlacement.Right">
+        <ChildContent>
+            <SteconFormField Label="Subject" Required="true">
+                <ChildContent Context="ctx">
+                    <SteconInput @bind-Value="_drawerSubject" DescribedBy="@ctx.DescribedBy" />
+                </ChildContent>
+            </SteconFormField>
+            <SteconFormField Label="Details">
+                <ChildContent Context="ctx">
+                    <SteconTextarea @bind-Value="_drawerDetails" DescribedBy="@ctx.DescribedBy" />
+                </ChildContent>
+            </SteconFormField>
+        </ChildContent>
+        <FooterContent>
+            <SteconButton Variant="ButtonVariant.Secondary" OnClick="@(() => _rightDrawerOpen = false)">Cancel</SteconButton>
+            <SteconButton Variant="ButtonVariant.Primary" OnClick="@(() => _rightDrawerOpen = false)">Submit</SteconButton>
+        </FooterContent>
+    </SteconDrawer>
+</section>
+
+<section class="stecon-overlay-gallery-section">
+    <h2>Confirm</h2>
+    <div class="stecon-overlay-gallery-row">
+        <SteconButton OnClick="@(() => _normalConfirmOpen = true)">Leave unsaved form?</SteconButton>
+        <SteconButton Variant="ButtonVariant.Danger" OnClick="@(() => _dangerConfirmOpen = true)">Delete item</SteconButton>
+    </div>
+
+    <SteconConfirm @bind-IsOpen="_normalConfirmOpen" Title="Leave without saving?"
+                    ConfirmLabel="Leave" CancelLabel="Stay"
+                    OnConfirm="HandleNormalConfirm" OnCancel="HandleNormalCancel">
+        Unsaved changes will be lost if you leave this page.
+    </SteconConfirm>
+
+    <SteconConfirm @bind-IsOpen="_dangerConfirmOpen" Title="Delete this item?"
+                    ConfirmLabel="Delete" CancelLabel="Cancel" Variant="ConfirmVariant.Danger"
+                    Busy="_dangerConfirmBusy" OnConfirm="HandleDangerConfirm" OnCancel="HandleDangerCancel">
+        This action cannot be undone.
+    </SteconConfirm>
+
+    <p>Last confirm result: @_lastConfirmResult</p>
+</section>
+
+<section class="stecon-overlay-gallery-section">
+    <h2>Toast</h2>
+    <div class="stecon-overlay-gallery-row">
+        <SteconButton OnClick="@(() => ShowToast(ToastVariant.Info))">Info</SteconButton>
+        <SteconButton OnClick="@(() => ShowToast(ToastVariant.Success))">Success</SteconButton>
+        <SteconButton OnClick="@(() => ShowToast(ToastVariant.Warning))">Warning</SteconButton>
+        <SteconButton OnClick="@(() => ShowToast(ToastVariant.Danger))">Danger</SteconButton>
+        <SteconButton OnClick="ShowPersistentToast">Persistent (manual dismiss)</SteconButton>
+        <SteconButton OnClick="ShowManyToasts">Show 8 toasts (capacity demo, MaxVisible=5)</SteconButton>
+        <SteconButton OnClick="@(() => _toastModalOpen = true)">Open modal (toast stays on top)</SteconButton>
+    </div>
+
+    <SteconModal @bind-IsOpen="_toastModalOpen" Title="Toast-over-modal check">
+        <ChildContent>
+            <p>Use the Toast buttons above while this modal is open - toasts must remain visible above it.</p>
+        </ChildContent>
+        <FooterContent>
+            <SteconButton OnClick="@(() => _toastModalOpen = false)">Close</SteconButton>
+        </FooterContent>
+    </SteconModal>
+</section>
+
+@code {
+    private bool _alertDismissed;
+
+    private bool _smallModalOpen;
+    private bool _mediumModalOpen;
+    private bool _largeModalOpen;
+    private bool _xlModalOpen;
+    private bool _fullscreenModalOpen;
+    private bool _tallModalOpen;
+    private bool _formModalOpen;
+    private bool _toastModalOpen;
+    private string? _formName;
+    private string _formRole = "engineer";
+
+    private bool _leftDrawerOpen;
+    private bool _rightDrawerOpen;
+    private bool _filterActive;
+    private bool _filterOverdue;
+    private string? _drawerSubject;
+    private string? _drawerDetails;
+
+    private bool _normalConfirmOpen;
+    private bool _dangerConfirmOpen;
+    private bool _dangerConfirmBusy;
+    private string _lastConfirmResult = "(none yet)";
+
+    private void ToggleTheme() =>
+        ThemeService.SetTheme(ThemeService.Current == ThemeMode.Light ? ThemeMode.Dark : ThemeMode.Light);
+
+    private void HandleAlertDismissed() => _alertDismissed = true;
+
+    private void HandleNormalConfirm()
+    {
+        _normalConfirmOpen = false;
+        _lastConfirmResult = "Left without saving";
+    }
+
+    private void HandleNormalCancel() => _lastConfirmResult = "Stayed on the page";
+
+    private async Task HandleDangerConfirm()
+    {
+        _dangerConfirmBusy = true;
+        StateHasChanged();
+        await Task.Delay(1000);
+        _dangerConfirmBusy = false;
+        _dangerConfirmOpen = false;
+        _lastConfirmResult = "Item deleted";
+    }
+
+    private void HandleDangerCancel() => _lastConfirmResult = "Delete cancelled";
+
+    private void ShowToast(ToastVariant variant) =>
+        ToastService.Show($"This is a {variant} toast.", variant);
+
+    private void ShowPersistentToast() =>
+        ToastService.Show("Persistent toast - dismiss me manually.", ToastVariant.Info, new ToastOptions { Duration = null });
+
+    private void ShowManyToasts()
+    {
+        for (var i = 1; i <= 8; i++)
+        {
+            ToastService.Show($"Toast #{i}", ToastVariant.Info);
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        ThemeService.ThemeChanged += OnThemeChanged;
+    }
+
+    private void OnThemeChanged(ThemeMode mode) => InvokeAsync(StateHasChanged);
+
+    public void Dispose() => ThemeService.ThemeChanged -= OnThemeChanged;
+}

@@ -1,0 +1,70 @@
+.stecon-alert {
+    box-sizing: border-box;
+    display: flex;
+    align-items: flex-start;
+    gap: var(--stecon-space-3);
+    padding: var(--stecon-space-4);
+    border-radius: var(--stecon-radius-md);
+    border: 1px solid var(--stecon-border-default);
+}
+
+.stecon-alert__icon {
+    display: inline-flex;
+    flex-shrink: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.stecon-alert__content {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.stecon-alert__title {
+    margin: 0 0 var(--stecon-space-1);
+    font-weight: var(--stecon-font-weight-semibold);
+}
+
+.stecon-alert__message {
+    min-width: 0;
+    font-size: var(--stecon-font-size-sm);
+}
+
+.stecon-alert--info {
+    background-color: var(--stecon-status-info-surface);
+    border-color: var(--stecon-status-info-surface);
+    color: var(--stecon-status-info);
+}
+
+.stecon-alert--success {
+    background-color: var(--stecon-status-success-surface);
+    border-color: var(--stecon-status-success-surface);
+    color: var(--stecon-status-success);
+}
+
+.stecon-alert--warning {
+    background-color: var(--stecon-status-warning-surface);
+    border-color: var(--stecon-status-warning-surface);
+    color: var(--stecon-status-warning);
+}
+
+.stecon-alert--danger {
+    background-color: var(--stecon-status-danger-surface);
+    border-color: var(--stecon-status-danger-surface);
+    color: var(--stecon-status-danger);
+}
+
+.stecon-alert--info .stecon-alert__title,
+.stecon-alert--success .stecon-alert__title,
+.stecon-alert--warning .stecon-alert__title,
+.stecon-alert--danger .stecon-alert__title,
+.stecon-alert--info .stecon-alert__message,
+.stecon-alert--success .stecon-alert__message,
+.stecon-alert--warning .stecon-alert__message,
+.stecon-alert--danger .stecon-alert__message {
+    /* Title/message always use text-primary (not the status color) - the icon
+       alone carries the status hue, keeping title/body text at full contrast
+       in both themes (status-color-on-surface is only vetted for the icon's
+       3:1 non-text requirement, not 4.5:1 body-text contrast). */
+    color: var(--stecon-text-primary);
+}

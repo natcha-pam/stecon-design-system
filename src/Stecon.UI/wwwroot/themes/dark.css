@@ -35,4 +35,8 @@
   --stecon-interactive-disabled: #2a3660;
   --stecon-on-interactive: #ffffff;
   --stecon-focus-ring: #3f63d1;
+
+  /* Overlay (M1D) - slightly stronger than light theme since dark surfaces
+     already have low ambient contrast against each other. */
+  --stecon-overlay-backdrop: rgba(0, 0, 0, 0.6);
 }

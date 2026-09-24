@@ -1,0 +1,89 @@
+@namespace Stecon.UI
+
+<SteconModal IsOpen="IsOpen"
+             IsOpenChanged="IsOpenChanged"
+             Title="@Title"
+             Size="ModalSize.Sm"
+             UseAlertDialogRole="@(Variant == ConfirmVariant.Danger)"
+             CloseOnBackdrop="@(!Busy)"
+             CloseOnEscape="@(!Busy)"
+             ShowCloseButton="false">
+    <ChildContent>
+        @ChildContent
+    </ChildContent>
+    <FooterContent>
+        <SteconButton Variant="ButtonVariant.Secondary" Disabled="Busy" OnClick="HandleCancelAsync">@CancelLabel</SteconButton>
+        <SteconButton Variant="@(Variant == ConfirmVariant.Danger ? ButtonVariant.Danger : ButtonVariant.Primary)"
+                      Loading="Busy" Disabled="Busy" OnClick="HandleConfirmAsync">@ConfirmLabel</SteconButton>
+    </FooterContent>
+</SteconModal>
+
+@code {
+    [Parameter]
+    public bool IsOpen { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> IsOpenChanged { get; set; }
+
+    [Parameter]
+    public string? Title { get; set; }
+
+    /// <summary>Confirmation message/content (e.g. "Delete this item?").</summary>
+    [Parameter, EditorRequired]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>Required - no English default. Thai-first applications must not accidentally ship English UI.</summary>
+    [Parameter, EditorRequired]
+    public string ConfirmLabel { get; set; } = default!;
+
+    /// <summary>Required - no English default.</summary>
+    [Parameter, EditorRequired]
+    public string CancelLabel { get; set; } = default!;
+
+    [Parameter]
+    public ConfirmVariant Variant { get; set; } = ConfirmVariant.Normal;
+
+    /// <summary>Disables both actions and shows a loading state on Confirm; also suppresses backdrop/Escape dismissal.</summary>
+    [Parameter]
+    public bool Busy { get; set; }
+
+    [Parameter]
+    public EventCallback OnConfirm { get; set; }
+
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+
+    // Defense-in-depth against a double-click racing ahead of the consumer's own Busy=true
+    // round-trip - SteconButton already blocks clicks once Busy propagates, this closes the gap.
+    private bool _confirmInFlight;
+
+    private async Task HandleConfirmAsync()
+    {
+        if (Busy || _confirmInFlight)
+        {
+            return;
+        }
+
+        _confirmInFlight = true;
+        try
+        {
+            await OnConfirm.InvokeAsync();
+        }
+        finally
+        {
+            _confirmInFlight = false;
+        }
+    }
+
+    private async Task HandleCancelAsync()
+    {
+        if (Busy)
+        {
+            return;
+        }
+
+        IsOpen = false;
+        await IsOpenChanged.InvokeAsync(false);
+        await OnCancel.InvokeAsync();
+    }
+}

@@ -21,6 +21,7 @@
             @Body
         </ChildContent>
     </SteconAppLayout>
+    <SteconToastHost Position="ToastPosition.BottomRight" />
 </SteconThemeProvider>
 
 <div id="blazor-error-ui" data-nosnippet>
@@ -40,6 +41,7 @@
         new() { Id = "foundation", Label = "Foundation", Href = "foundation", Icon = IconName.ChevronRight },
         new() { Id = "sidebar-gallery", Label = "Sidebar Gallery", Href = "sidebar-gallery", Icon = IconName.ChevronRight },
         new() { Id = "core-components-gallery", Label = "Core Components Gallery", Href = "core-components-gallery", Icon = IconName.ChevronRight },
+        new() { Id = "overlay-feedback-gallery", Label = "Overlay & Feedback Gallery", Href = "overlay-feedback-gallery", Icon = IconName.ChevronRight },
     };
 
     private void OpenMobileSidebar() => _mobileOpen = true;
