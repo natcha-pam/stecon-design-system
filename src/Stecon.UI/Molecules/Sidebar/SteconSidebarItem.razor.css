@@ -24,15 +24,16 @@
 }
 
 .stecon-sidebar-item__row:focus-visible {
-    outline: 2px solid var(--stecon-status-info);
+    outline: 2px solid var(--stecon-focus-ring);
     outline-offset: -2px;
 }
 
+/* Selected navigation follows the active palette (M3) - not a semantic Info state. */
 .stecon-sidebar-item--active > .stecon-sidebar-item__row {
-    background-color: var(--stecon-status-info-surface);
-    color: var(--stecon-status-info);
+    background-color: var(--stecon-palette-accent-soft);
+    color: var(--stecon-palette-accent-on-soft);
     font-weight: var(--stecon-font-weight-semibold);
-    border-left: 3px solid var(--stecon-status-info);
+    border-left: 3px solid var(--stecon-palette-accent);
 }
 
 .stecon-sidebar-item__link--disabled {

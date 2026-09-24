@@ -29,18 +29,43 @@
   --stecon-status-info-surface: #e6f0fa;
 
   /*
+    Palette (M3) - the STECON palette's accent, the default when no other
+    [data-palette] is selected. Interactive/focus tokens alias this so every
+    palette only needs to define ONE set of accent values (docs/12-THEME-PALETTE.md).
+  */
+  --stecon-palette-accent: #1d4ed8;
+  --stecon-palette-accent-hover: #1739ad;
+  --stecon-palette-accent-active: #142d85;
+  --stecon-palette-accent-soft: #e8edfc;
+  --stecon-palette-accent-on: #ffffff;
+  /* Text/icon color drawn on top of accent-soft. Equal to accent in light theme (already
+     passes 4.5:1 there) - kept as its own token because dark theme needs a different,
+     lighter shade for the same role (see themes/dark.css). */
+  --stecon-palette-accent-on-soft: #1d4ed8;
+
+  /*
     Interactive (M1C) - the semantic identity for primary actions/focus.
     Deliberately independent from both brand-blue and status-info so
     "primary action" keeps its own meaning (see docs/02-DESIGN-TOKENS.md
-    semantic rule). Values chosen for accessible contrast against
-    --stecon-on-interactive.
+    semantic rule). Aliases --stecon-palette-accent* (M3) so palette selection
+    changes primary actions/focus without a second, drift-prone set of values.
   */
-  --stecon-interactive-default: #1d4ed8;
-  --stecon-interactive-hover: #1739ad;
-  --stecon-interactive-active: #142d85;
+  --stecon-interactive-default: var(--stecon-palette-accent);
+  --stecon-interactive-hover: var(--stecon-palette-accent-hover);
+  --stecon-interactive-active: var(--stecon-palette-accent-active);
   --stecon-interactive-disabled: #c3cdf0;
-  --stecon-on-interactive: #ffffff;
-  --stecon-focus-ring: #1d4ed8;
+  --stecon-on-interactive: var(--stecon-palette-accent-on);
+  --stecon-focus-ring: var(--stecon-palette-accent);
+
+  /* Chart-series (M3) - prepares Charts (later milestone). Deliberately mode-only
+     (not palette-specific) so data-series color coding stays stable regardless
+     of the selected UI accent palette. Distinct from Success/Warning/Danger/Info. */
+  --stecon-chart-series-1: #2563eb;
+  --stecon-chart-series-2: #7c3aed;
+  --stecon-chart-series-3: #0d9488;
+  --stecon-chart-series-4: #ca8a04;
+  --stecon-chart-series-5: #db2777;
+  --stecon-chart-series-6: #4d7c0f;
 
   /* Overlay (M1D) - scrim behind Modal/Drawer. Reported as a genuinely missing
      semantic token during M1D inspection (no existing token models a

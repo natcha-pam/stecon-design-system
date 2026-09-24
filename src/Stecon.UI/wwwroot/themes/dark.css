@@ -28,13 +28,35 @@
   --stecon-status-info: #4c9be0;
   --stecon-status-info-surface: #132a3a;
 
+  /* Palette (M3) - see themes/light.css for the semantic rationale. */
+  --stecon-palette-accent: #3f63d1;
+  /* Reuses the Light-theme hover shade (#1739ad) - the original dark hover (#5578e0) only
+     reached ~4.08:1 against white on-interactive text, below the WCAG AA 4.5:1 normal-text
+     threshold (found via PaletteContrastTests). Active (#2f4bb0) already passes at ~7.6:1
+     and is intentionally left unchanged. */
+  --stecon-palette-accent-hover: #1739ad;
+  --stecon-palette-accent-active: #2f4bb0;
+  --stecon-palette-accent-soft: #1c2947;
+  --stecon-palette-accent-on: #ffffff;
+  /* Lighter than --stecon-palette-accent: text-on-tinted-surface needs a different luminance
+     than solid-fill-with-white-text (verified via PaletteContrastTests). */
+  --stecon-palette-accent-on-soft: #4c9be0;
+
   /* Interactive (M1C) - see themes/light.css for the semantic rationale. */
-  --stecon-interactive-default: #3f63d1;
-  --stecon-interactive-hover: #5578e0;
-  --stecon-interactive-active: #2f4bb0;
+  --stecon-interactive-default: var(--stecon-palette-accent);
+  --stecon-interactive-hover: var(--stecon-palette-accent-hover);
+  --stecon-interactive-active: var(--stecon-palette-accent-active);
   --stecon-interactive-disabled: #2a3660;
-  --stecon-on-interactive: #ffffff;
-  --stecon-focus-ring: #3f63d1;
+  --stecon-on-interactive: var(--stecon-palette-accent-on);
+  --stecon-focus-ring: var(--stecon-palette-accent);
+
+  /* Chart-series (M3) - see themes/light.css; lightened for dark-surface visibility. */
+  --stecon-chart-series-1: #60a5fa;
+  --stecon-chart-series-2: #a78bfa;
+  --stecon-chart-series-3: #2dd4bf;
+  --stecon-chart-series-4: #eab308;
+  --stecon-chart-series-5: #f472b6;
+  --stecon-chart-series-6: #84cc16;
 
   /* Overlay (M1D) - slightly stronger than light theme since dark surfaces
      already have low ambient contrast against each other. */

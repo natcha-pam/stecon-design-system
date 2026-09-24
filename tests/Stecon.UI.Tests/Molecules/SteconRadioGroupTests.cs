@@ -34,6 +34,33 @@ public class SteconRadioGroupTests : BunitContext
         Assert.Equal("b", selected);
     }
 
+    // Regression: a real browser reports a radio's onchange Value as a string (the input's
+    // .value, "on" by default - never a bool), unlike bUnit's Change(true) helper used above
+    // which passes a real bool and previously masked an InvalidCastException in production.
+    [Fact]
+    public void SelectAsync_WorksWithRealBrowserStringChangeEventValue()
+    {
+        var selected = "a";
+        var cut = Render<SteconRadioGroup<string>>(p => p
+            .Add(x => x.Value, selected)
+            .Add(x => x.ValueChanged, v => selected = v)
+            .AddChildContent(builder =>
+            {
+                builder.OpenComponent<SteconRadio<string>>(0);
+                builder.AddComponentParameter(1, "Value", "a");
+                builder.CloseComponent();
+
+                builder.OpenComponent<SteconRadio<string>>(2);
+                builder.AddComponentParameter(3, "Value", "b");
+                builder.CloseComponent();
+            }));
+
+        var radios = cut.FindAll("input[type=radio]");
+        radios[1].TriggerEvent("onchange", new Microsoft.AspNetCore.Components.ChangeEventArgs { Value = "on" });
+
+        Assert.Equal("b", selected);
+    }
+
     [Fact]
     public void RendersFieldsetLegend_WhenLabelProvided()
     {

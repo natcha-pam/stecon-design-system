@@ -43,4 +43,58 @@ public class ThemeServiceTests
 
         Assert.Equal(0, raiseCount);
     }
+
+    [Fact]
+    public void CurrentPalette_DefaultsToStecon()
+    {
+        var sut = new ThemeService();
+
+        Assert.Equal(SteconPalette.Stecon, sut.CurrentPalette);
+    }
+
+    [Fact]
+    public void SetPalette_UpdatesCurrentPalette()
+    {
+        var sut = new ThemeService();
+
+        sut.SetPalette(SteconPalette.Peacock);
+
+        Assert.Equal(SteconPalette.Peacock, sut.CurrentPalette);
+    }
+
+    [Fact]
+    public void SetPalette_RaisesPaletteChanged_WhenValueChanges()
+    {
+        var sut = new ThemeService();
+        SteconPalette? raised = null;
+        sut.PaletteChanged += p => raised = p;
+
+        sut.SetPalette(SteconPalette.Purple);
+
+        Assert.Equal(SteconPalette.Purple, raised);
+    }
+
+    [Fact]
+    public void SetPalette_DoesNotRaisePaletteChanged_WhenValueIsUnchanged()
+    {
+        var sut = new ThemeService();
+        var raiseCount = 0;
+        sut.PaletteChanged += _ => raiseCount++;
+
+        sut.SetPalette(SteconPalette.Stecon);
+
+        Assert.Equal(0, raiseCount);
+    }
+
+    [Fact]
+    public void SetPalette_DoesNotAffectMode_AndSetTheme_DoesNotAffectPalette()
+    {
+        var sut = new ThemeService();
+
+        sut.SetPalette(SteconPalette.Sunset);
+        Assert.Equal(ThemeMode.Light, sut.Current);
+
+        sut.SetTheme(ThemeMode.Dark);
+        Assert.Equal(SteconPalette.Sunset, sut.CurrentPalette);
+    }
 }

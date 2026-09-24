@@ -161,8 +161,9 @@
     transform: rotate(0deg);
 }
 
+/* Selected row follows the active palette (M3) - not a semantic Info state. */
 .stecon-data-table__row--selected {
-    background-color: var(--stecon-status-info-surface);
+    background-color: var(--stecon-palette-accent-soft);
 }
 
 .stecon-data-table tbody tr:hover {

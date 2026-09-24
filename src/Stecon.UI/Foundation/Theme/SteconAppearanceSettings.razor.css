@@ -1,0 +1,77 @@
+.stecon-appearance-settings {
+    display: flex;
+    flex-direction: column;
+    gap: var(--stecon-space-6);
+}
+
+.stecon-appearance-settings__section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--stecon-space-3);
+}
+
+.stecon-appearance-settings__heading {
+    margin: 0;
+    font-size: var(--stecon-font-size-sm);
+    font-weight: var(--stecon-font-weight-semibold);
+    color: var(--stecon-text-primary);
+}
+
+.stecon-appearance-settings__swatches {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--stecon-space-3);
+}
+
+.stecon-appearance-settings__swatch {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--stecon-space-1);
+    padding: var(--stecon-space-2);
+    border: 2px solid var(--stecon-border-default);
+    border-radius: var(--stecon-radius-md);
+    cursor: pointer;
+    min-width: 5.5rem;
+}
+
+.stecon-appearance-settings__swatch:focus-within {
+    outline: 2px solid var(--stecon-focus-ring);
+    outline-offset: 2px;
+}
+
+.stecon-appearance-settings__swatch--selected {
+    border-color: var(--stecon-palette-accent);
+}
+
+.stecon-appearance-settings__swatch-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.stecon-appearance-settings__swatch-chip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--stecon-radius-sm);
+    color: #ffffff;
+}
+
+.stecon-appearance-settings__swatch-name {
+    font-size: var(--stecon-font-size-xs);
+    color: var(--stecon-text-primary);
+    text-align: center;
+}
+
+.stecon-appearance-settings__swatch--selected .stecon-appearance-settings__swatch-name {
+    font-weight: var(--stecon-font-weight-semibold);
+}

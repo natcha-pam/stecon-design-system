@@ -2,7 +2,7 @@
 @implements IDisposable
 @inject IThemeService ThemeService
 
-<div class="stecon-theme-root" data-theme="@ThemeAttribute">
+<div class="stecon-theme-root" data-theme="@ThemeAttribute" data-palette="@PaletteAttribute">
     @ChildContent
 </div>
 
@@ -15,18 +15,32 @@
     [Parameter]
     public ThemeMode InitialTheme { get; set; } = ThemeMode.Light;
 
+    /// <summary>Palette applied the first time this provider initializes. To change afterward, use <see cref="IThemeService.SetPalette"/> rather than setting this parameter again.</summary>
+    [Parameter]
+    public SteconPalette InitialPalette { get; set; } = SteconPalette.Stecon;
+
     [Parameter, EditorRequired]
     public RenderFragment? ChildContent { get; set; }
 
     private string ThemeAttribute => ThemeService.Current == ThemeMode.Dark ? "dark" : "light";
 
+    private string PaletteAttribute => ThemeService.CurrentPalette.ToString().ToLowerInvariant();
+
     protected override void OnInitialized()
     {
         ThemeService.SetTheme(InitialTheme);
+        ThemeService.SetPalette(InitialPalette);
         ThemeService.ThemeChanged += OnThemeChanged;
+        ThemeService.PaletteChanged += OnPaletteChanged;
     }
 
     private void OnThemeChanged(ThemeMode mode) => InvokeAsync(StateHasChanged);
 
-    public void Dispose() => ThemeService.ThemeChanged -= OnThemeChanged;
+    private void OnPaletteChanged(SteconPalette palette) => InvokeAsync(StateHasChanged);
+
+    public void Dispose()
+    {
+        ThemeService.ThemeChanged -= OnThemeChanged;
+        ThemeService.PaletteChanged -= OnPaletteChanged;
+    }
 }

@@ -9,6 +9,7 @@ namespace Stecon.UI;
 public sealed class ThemeService : IThemeService
 {
     private ThemeMode _current = ThemeMode.Light;
+    private SteconPalette _currentPalette = SteconPalette.Stecon;
 
     public ThemeMode Current => _current;
 
@@ -23,5 +24,20 @@ public sealed class ThemeService : IThemeService
 
         _current = mode;
         ThemeChanged?.Invoke(_current);
+    }
+
+    public SteconPalette CurrentPalette => _currentPalette;
+
+    public event Action<SteconPalette>? PaletteChanged;
+
+    public void SetPalette(SteconPalette palette)
+    {
+        if (_currentPalette == palette)
+        {
+            return;
+        }
+
+        _currentPalette = palette;
+        PaletteChanged?.Invoke(_currentPalette);
     }
 }

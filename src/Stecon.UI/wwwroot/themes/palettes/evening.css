@@ -1,0 +1,22 @@
+/*
+  Evening palette (M3) - dusk/muted violet-indigo, sophisticated, calm,
+  strong Dark-mode compatibility. Direction word derived from a visual
+  reference, not an official STECON brand color - see docs/12-THEME-PALETTE.md.
+*/
+[data-theme='light'][data-palette='evening'] {
+  --stecon-palette-accent: #4c3a75;
+  --stecon-palette-accent-hover: #3e2f60;
+  --stecon-palette-accent-active: #31254c;
+  --stecon-palette-accent-soft: #ece8f5;
+  --stecon-palette-accent-on: #ffffff;
+  --stecon-palette-accent-on-soft: #4c3a75;
+}
+
+[data-theme='dark'][data-palette='evening'] {
+  --stecon-palette-accent: #4c3a75;
+  --stecon-palette-accent-hover: #3e2f60;
+  --stecon-palette-accent-active: #31254c;
+  --stecon-palette-accent-soft: #1a1530;
+  --stecon-palette-accent-on: #ffffff;
+  --stecon-palette-accent-on-soft: #b7a9e6;
+}

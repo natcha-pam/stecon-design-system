@@ -1,0 +1,24 @@
+/*
+  Peach palette (M3) - warm peach/terracotta accent, warm-neutral feeling.
+  Chosen deliberately deeper than a pastel peach so solid-fill contrast against
+  white on-interactive text stays accessible (see docs/12-THEME-PALETTE.md and
+  PaletteContrastTests). Direction word derived from a visual reference, not
+  an official STECON brand color.
+*/
+[data-theme='light'][data-palette='peach'] {
+  --stecon-palette-accent: #a34a1f;
+  --stecon-palette-accent-hover: #8a3e1a;
+  --stecon-palette-accent-active: #702f14;
+  --stecon-palette-accent-soft: #fdece0;
+  --stecon-palette-accent-on: #ffffff;
+  --stecon-palette-accent-on-soft: #a34a1f;
+}
+
+[data-theme='dark'][data-palette='peach'] {
+  --stecon-palette-accent: #a34a1f;
+  --stecon-palette-accent-hover: #8a3e1a;
+  --stecon-palette-accent-active: #702f14;
+  --stecon-palette-accent-soft: #301708;
+  --stecon-palette-accent-on: #ffffff;
+  --stecon-palette-accent-on-soft: #f0a37a;
+}

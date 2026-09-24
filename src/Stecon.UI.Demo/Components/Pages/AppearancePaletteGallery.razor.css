@@ -1,0 +1,95 @@
+/*
+  Gallery-only playground styling - not part of the Stecon.UI public
+  component API.
+*/
+
+p {
+    overflow-wrap: anywhere;
+}
+
+.stecon-appearance-gallery-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--stecon-space-3);
+    padding: var(--stecon-space-4);
+    margin-bottom: var(--stecon-space-6);
+    background-color: var(--stecon-surface-card);
+    border: 1px solid var(--stecon-border-default);
+    border-radius: var(--stecon-radius-md);
+    min-width: 0;
+}
+
+.stecon-appearance-gallery-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--stecon-space-3);
+}
+
+.stecon-appearance-gallery-sidebar-sample {
+    max-width: 16rem;
+    border: 1px solid var(--stecon-border-default);
+    border-radius: var(--stecon-radius-md);
+    overflow: hidden;
+}
+
+.stecon-appearance-gallery-chart-swatches {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--stecon-space-3);
+}
+
+.stecon-appearance-gallery-chart-swatch {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 6rem;
+    padding: var(--stecon-space-3);
+    border-radius: var(--stecon-radius-sm);
+    color: #ffffff;
+    font-size: var(--stecon-font-size-xs);
+    font-weight: var(--stecon-font-weight-semibold);
+}
+
+.stecon-appearance-gallery-chart-swatch--1 { background-color: var(--stecon-chart-series-1); }
+.stecon-appearance-gallery-chart-swatch--2 { background-color: var(--stecon-chart-series-2); }
+.stecon-appearance-gallery-chart-swatch--3 { background-color: var(--stecon-chart-series-3); }
+.stecon-appearance-gallery-chart-swatch--4 { background-color: var(--stecon-chart-series-4); }
+.stecon-appearance-gallery-chart-swatch--5 { background-color: var(--stecon-chart-series-5); }
+.stecon-appearance-gallery-chart-swatch--6 { background-color: var(--stecon-chart-series-6); }
+
+.stecon-appearance-gallery-kpis {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--stecon-space-4);
+}
+
+.stecon-appearance-gallery-kpi {
+    display: flex;
+    flex-direction: column;
+    gap: var(--stecon-space-1);
+    min-width: 10rem;
+    padding: var(--stecon-space-4);
+    background-color: var(--stecon-surface-page);
+    border-left: 3px solid var(--stecon-palette-accent);
+    border-radius: var(--stecon-radius-sm);
+}
+
+.stecon-appearance-gallery-kpi__label {
+    font-size: var(--stecon-font-size-xs);
+    color: var(--stecon-text-secondary);
+}
+
+.stecon-appearance-gallery-kpi__value {
+    font-size: var(--stecon-font-size-2xl);
+    font-weight: var(--stecon-font-weight-bold);
+    color: var(--stecon-text-primary);
+}
+
+.stecon-appearance-gallery-kpi__trend--up {
+    color: var(--stecon-status-success);
+}
+
+.stecon-appearance-gallery-kpi__trend--down {
+    color: var(--stecon-status-danger);
+}

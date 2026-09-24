@@ -1,0 +1,23 @@
+/*
+  Sunset palette (M3) - warm coral/orange-red accent, energetic. Deliberately
+  more saturated/reddish than --stecon-status-warning (amber/brown) to avoid
+  Warning-color confusion. Direction word derived from a visual reference,
+  not an official STECON brand color - see docs/12-THEME-PALETTE.md.
+*/
+[data-theme='light'][data-palette='sunset'] {
+  --stecon-palette-accent: #c2410c;
+  --stecon-palette-accent-hover: #9a3412;
+  --stecon-palette-accent-active: #7c2d12;
+  --stecon-palette-accent-soft: #ffedd5;
+  --stecon-palette-accent-on: #ffffff;
+  --stecon-palette-accent-on-soft: #c2410c;
+}
+
+[data-theme='dark'][data-palette='sunset'] {
+  --stecon-palette-accent: #c2410c;
+  --stecon-palette-accent-hover: #9a3412;
+  --stecon-palette-accent-active: #7c2d12;
+  --stecon-palette-accent-soft: #2b1206;
+  --stecon-palette-accent-on: #ffffff;
+  --stecon-palette-accent-on-soft: #fb923c;
+}

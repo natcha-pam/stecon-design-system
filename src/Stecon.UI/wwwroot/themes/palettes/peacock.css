@@ -1,0 +1,23 @@
+/*
+  Peacock palette (M3) - blue-forward teal accent, rich but professional.
+  Deliberately more blue than green to avoid Success-color confusion.
+  Direction word derived from a visual reference, not an official STECON
+  brand color - see docs/12-THEME-PALETTE.md.
+*/
+[data-theme='light'][data-palette='peacock'] {
+  --stecon-palette-accent: #0e7490;
+  --stecon-palette-accent-hover: #155e75;
+  --stecon-palette-accent-active: #164e63;
+  --stecon-palette-accent-soft: #e0f2fe;
+  --stecon-palette-accent-on: #ffffff;
+  --stecon-palette-accent-on-soft: #0e7490;
+}
+
+[data-theme='dark'][data-palette='peacock'] {
+  --stecon-palette-accent: #0e7490;
+  --stecon-palette-accent-hover: #155e75;
+  --stecon-palette-accent-active: #164e63;
+  --stecon-palette-accent-soft: #0a2530;
+  --stecon-palette-accent-on: #ffffff;
+  --stecon-palette-accent-on-soft: #38bdf8;
+}

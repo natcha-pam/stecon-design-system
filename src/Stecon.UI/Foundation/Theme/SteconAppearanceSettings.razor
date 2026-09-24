@@ -1,0 +1,98 @@
+@namespace Stecon.UI
+
+@* Reusable Mode + Palette settings surface, composed from existing STECON atoms/molecules only.
+   Fully controlled (Appearance/AppearanceChanged) - consumer owns the real IThemeService calls,
+   mirroring the M2B SteconDataTableColumnSettings Layout/LayoutChanged pattern. Consumers place
+   this inside their own SteconDrawer/SteconModal if an overlay is desired. *@
+
+<div class="@CssClass" @attributes="SplatAttributes">
+    <section class="stecon-appearance-settings__section">
+        <h3 class="stecon-appearance-settings__heading">@Labels.ModeSectionLabel</h3>
+        <SteconRadioGroup TValue="ThemeMode" Value="Appearance.Mode" ValueChanged="HandleModeChangedAsync">
+            <SteconRadio TValue="ThemeMode" Value="ThemeMode.Light">@Labels.LightLabel</SteconRadio>
+            <SteconRadio TValue="ThemeMode" Value="ThemeMode.Dark">@Labels.DarkLabel</SteconRadio>
+        </SteconRadioGroup>
+    </section>
+
+    <section class="stecon-appearance-settings__section">
+        <h3 class="stecon-appearance-settings__heading">@Labels.PaletteSectionLabel</h3>
+        <div class="stecon-appearance-settings__swatches" role="radiogroup" aria-label="@Labels.PaletteSectionLabel">
+            @foreach (var palette in AllPalettes)
+            {
+                var isSelected = Appearance.Palette == palette;
+                <label class="stecon-appearance-settings__swatch @(isSelected ? "stecon-appearance-settings__swatch--selected" : null)">
+                    <input type="radio"
+                           class="stecon-appearance-settings__swatch-input"
+                           name="@_paletteGroupName"
+                           checked="@isSelected"
+                           @onchange="@(() => HandlePaletteChangedAsync(palette))" />
+                    <span class="stecon-appearance-settings__swatch-chip" style="@GetSwatchStyle(palette)" aria-hidden="true">
+                        @if (isSelected)
+                        {
+                            <SteconIcon Name="IconName.CheckCircle" />
+                        }
+                    </span>
+                    <span class="stecon-appearance-settings__swatch-name">@GetPaletteLabel(palette)</span>
+                </label>
+            }
+        </div>
+    </section>
+
+    <SteconButton Variant="ButtonVariant.Ghost" Size="ControlSize.Sm" OnClick="HandleResetAsync">@Labels.ResetLabel</SteconButton>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public SteconAppearanceState Appearance { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public EventCallback<SteconAppearanceState> AppearanceChanged { get; set; }
+
+    [Parameter, EditorRequired]
+    public SteconAppearanceSettingsLabels Labels { get; set; } = default!;
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private readonly string _paletteGroupName = $"stecon-appearance-palette-{Guid.NewGuid():N}";
+
+    private static readonly IReadOnlyList<SteconPalette> AllPalettes = Enum.GetValues<SteconPalette>();
+
+    private string CssClass => CssClassMerge.Combine("stecon-appearance-settings", AdditionalAttributes);
+
+    private IReadOnlyDictionary<string, object>? SplatAttributes => CssClassMerge.AttributesWithoutClass(AdditionalAttributes);
+
+    private string GetPaletteLabel(SteconPalette palette) => palette switch
+    {
+        SteconPalette.Stecon => Labels.SteconPaletteLabel,
+        SteconPalette.Romantic => Labels.RomanticPaletteLabel,
+        SteconPalette.Evening => Labels.EveningPaletteLabel,
+        SteconPalette.Sunset => Labels.SunsetPaletteLabel,
+        SteconPalette.Purple => Labels.PurplePaletteLabel,
+        SteconPalette.Peach => Labels.PeachPaletteLabel,
+        SteconPalette.Peacock => Labels.PeacockPaletteLabel,
+        _ => palette.ToString(),
+    };
+
+    // Representative light-mode accent per palette, for simple at-a-glance recognizability
+    // regardless of the app's current Mode - intentionally duplicated from the CSS palette
+    // files (a small, documented preview-only constant, not a functional design token).
+    private static string GetSwatchStyle(SteconPalette palette) => palette switch
+    {
+        SteconPalette.Stecon => "background-color:#1d4ed8",
+        SteconPalette.Romantic => "background-color:#be185d",
+        SteconPalette.Evening => "background-color:#4c3a75",
+        SteconPalette.Sunset => "background-color:#c2410c",
+        SteconPalette.Purple => "background-color:#7c3aed",
+        SteconPalette.Peach => "background-color:#a34a1f",
+        SteconPalette.Peacock => "background-color:#0e7490",
+        _ => "background-color:#1d4ed8",
+    };
+
+    private Task HandleModeChangedAsync(ThemeMode mode) => AppearanceChanged.InvokeAsync(Appearance with { Mode = mode });
+
+    private Task HandlePaletteChangedAsync(SteconPalette palette) => AppearanceChanged.InvokeAsync(Appearance with { Palette = palette });
+
+    /// <summary>Resets only the palette to <see cref="SteconPalette.Stecon"/> - Mode (Light/Dark) is the user's own display preference and is left untouched.</summary>
+    private Task HandleResetAsync() => AppearanceChanged.InvokeAsync(Appearance with { Palette = SteconPalette.Stecon });
+}

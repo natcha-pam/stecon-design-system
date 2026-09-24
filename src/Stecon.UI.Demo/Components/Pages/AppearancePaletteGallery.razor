@@ -1,0 +1,229 @@
+@page "/appearance-palette-gallery"
+@inject IThemeService ThemeService
+@implements IDisposable
+@using Stecon.UI.Demo.Components.Pages
+
+<PageTitle>Appearance &amp; Palette Gallery</PageTitle>
+
+<h1>Appearance &amp; Palette Gallery</h1>
+<p>
+    Verify Mode (Light, Dark) times Palette (STECON, Romantic, Evening, Sunset,
+    Purple, Peach, Peacock) across representative components. Resize the browser
+    to <strong>375px</strong>, <strong>768px</strong>, and <strong>1440px</strong>.
+    All data on this page is fake/demo data.
+</p>
+
+<section class="stecon-appearance-gallery-section">
+    <h2>Appearance settings</h2>
+    <SteconAppearanceSettings Appearance="_appearance" AppearanceChanged="HandleAppearanceChangedAsync" Labels="Labels" />
+</section>
+
+<section class="stecon-appearance-gallery-section">
+    <h2>Buttons (Danger must never follow the palette)</h2>
+    <div class="stecon-appearance-gallery-row">
+        <SteconButton Variant="ButtonVariant.Primary">Primary</SteconButton>
+        <SteconButton Variant="ButtonVariant.Secondary">Secondary</SteconButton>
+        <SteconButton Variant="ButtonVariant.Ghost">Ghost</SteconButton>
+        <SteconButton Variant="ButtonVariant.Danger">Danger</SteconButton>
+    </div>
+</section>
+
+<section class="stecon-appearance-gallery-section">
+    <h2>Forms &amp; selection controls</h2>
+    <div class="stecon-appearance-gallery-row">
+        <SteconInput Placeholder="Requester name" />
+        <SteconSelect TValue="string" Value="@("approved")" ValueChanged="@((string _) => {})">
+            <option value="pending">Pending</option>
+            <option value="approved">Approved</option>
+        </SteconSelect>
+        <SteconCheckbox Value="true" ValueChanged="@((bool _) => {})">Notify me</SteconCheckbox>
+        <SteconSwitch Value="true" ValueChanged="@((bool _) => {})">Auto-refresh</SteconSwitch>
+    </div>
+</section>
+
+<section class="stecon-appearance-gallery-section">
+    <h2>Sidebar / navigation sample (selected item follows palette)</h2>
+    <div class="stecon-appearance-gallery-sidebar-sample">
+        <SteconSidebar Variant="SidebarVariant.Compact" Items="_navSample" />
+    </div>
+</section>
+
+<section class="stecon-appearance-gallery-section">
+    <h2>Badges &amp; Alerts (semantic states stay semantic)</h2>
+    <div class="stecon-appearance-gallery-row">
+        <SteconBadge Variant="BadgeVariant.Success">Success</SteconBadge>
+        <SteconBadge Variant="BadgeVariant.Warning">Warning</SteconBadge>
+        <SteconBadge Variant="BadgeVariant.Danger">Danger</SteconBadge>
+        <SteconBadge Variant="BadgeVariant.Info">Info</SteconBadge>
+    </div>
+    <SteconAlert Variant="AlertVariant.Success">Approved successfully.</SteconAlert>
+    <SteconAlert Variant="AlertVariant.Warning">Nearing budget threshold.</SteconAlert>
+    <SteconAlert Variant="AlertVariant.Danger">Failed to load approvals.</SteconAlert>
+    <SteconAlert Variant="AlertVariant.Info">A newer version is available.</SteconAlert>
+</section>
+
+<section class="stecon-appearance-gallery-section">
+    <h2>Overlay sample</h2>
+    <SteconButton OnClick="@(() => _modalOpen = true)">Open sample modal</SteconButton>
+    <SteconModal @bind-IsOpen="_modalOpen" Title="Sample overlay">
+        <p>Overlay content must stay legible across every Mode x Palette combination.</p>
+        <p>ยืนยันการดำเนินการ - long Thai content to verify legibility and wrapping.</p>
+    </SteconModal>
+</section>
+
+<section class="stecon-appearance-gallery-section">
+    <h2>DataTable - selected row, pinned columns, Column Settings</h2>
+    <p><strong>Selected (@_selected.Count):</strong> @string.Join(", ", _selected)</p>
+    <SteconButton Variant="ButtonVariant.Secondary" Size="ControlSize.Sm" OnClick="@(() => _columnSettingsOpen = true)">Open column settings</SteconButton>
+    <SteconDataTable @ref="_tableRef" TItem="ResourceItem" Items="DataTableDemoData.Resources" RowKey="@(i => i.EmployeeId)"
+                      Layout="_tableLayout" SelectionMode="DataTableSelectionMode.Multiple"
+                      SelectedKeys="_selected" SelectedKeysChanged="@(keys => _selected = keys)"
+                      RowAriaLabel="@(i => $"Select {i.EmployeeId}")" SelectAllLabel="Select all resources on this page">
+        <Columns>
+            <SteconDataColumn TItem="ResourceItem" Key="jobNo" Title="Job No" Width="90px">
+                <CellTemplate Context="item">@item.JobNo</CellTemplate>
+            </SteconDataColumn>
+            <SteconDataColumn TItem="ResourceItem" Key="nameThai" Title="ชื่อ (ไทย)" Width="180px">
+                <CellTemplate Context="item">@item.NameThai</CellTemplate>
+            </SteconDataColumn>
+            <SteconDataColumn TItem="ResourceItem" Key="nameEnglish" Title="Name (English)" Width="180px">
+                <CellTemplate Context="item">@item.NameEnglish</CellTemplate>
+            </SteconDataColumn>
+            <SteconDataColumn TItem="ResourceItem" Key="department" Title="Department" Width="140px">
+                <CellTemplate Context="item">@item.Department</CellTemplate>
+            </SteconDataColumn>
+            <SteconDataColumn TItem="ResourceItem" Key="remarks" Title="Remarks" MinWidth="16rem">
+                <CellTemplate Context="item">@item.Remarks</CellTemplate>
+            </SteconDataColumn>
+        </Columns>
+    </SteconDataTable>
+    <SteconDrawer @bind-IsOpen="_columnSettingsOpen" Title="Column settings">
+        @if (_tableRef is not null)
+        {
+            <SteconDataTableColumnSettings Columns="_tableRef.ColumnDescriptors" Layout="EffectiveTableLayout"
+                                            LayoutChanged="@(l => _tableLayout = l)" Labels="ColumnSettingsLabels" />
+        }
+    </SteconDrawer>
+</section>
+
+<section class="stecon-appearance-gallery-section">
+    <h2>Chart-series color preview (colors only - no chart engine yet)</h2>
+    <p>Mode-only (not palette-specific) so data-series color coding stays stable across palettes.</p>
+    <div class="stecon-appearance-gallery-chart-swatches">
+        <div class="stecon-appearance-gallery-chart-swatch stecon-appearance-gallery-chart-swatch--1">Series 1</div>
+        <div class="stecon-appearance-gallery-chart-swatch stecon-appearance-gallery-chart-swatch--2">Series 2</div>
+        <div class="stecon-appearance-gallery-chart-swatch stecon-appearance-gallery-chart-swatch--3">Series 3</div>
+        <div class="stecon-appearance-gallery-chart-swatch stecon-appearance-gallery-chart-swatch--4">Series 4</div>
+        <div class="stecon-appearance-gallery-chart-swatch stecon-appearance-gallery-chart-swatch--5">Series 5</div>
+        <div class="stecon-appearance-gallery-chart-swatch stecon-appearance-gallery-chart-swatch--6">Series 6</div>
+    </div>
+</section>
+
+<section class="stecon-appearance-gallery-section">
+    <h2>Dashboard theme preview (Demo-only presentation, not a new component API)</h2>
+    <div class="stecon-appearance-gallery-kpis">
+        <div class="stecon-appearance-gallery-kpi">
+            <span class="stecon-appearance-gallery-kpi__label">Open requests</span>
+            <span class="stecon-appearance-gallery-kpi__value">128</span>
+            <span class="stecon-appearance-gallery-kpi__trend stecon-appearance-gallery-kpi__trend--up">+4.2%</span>
+        </div>
+        <div class="stecon-appearance-gallery-kpi">
+            <span class="stecon-appearance-gallery-kpi__label">Approved this month</span>
+            <span class="stecon-appearance-gallery-kpi__value">87</span>
+            <span class="stecon-appearance-gallery-kpi__trend stecon-appearance-gallery-kpi__trend--up">+11%</span>
+        </div>
+        <div class="stecon-appearance-gallery-kpi">
+            <span class="stecon-appearance-gallery-kpi__label">Overdue</span>
+            <span class="stecon-appearance-gallery-kpi__value">5</span>
+            <span class="stecon-appearance-gallery-kpi__trend stecon-appearance-gallery-kpi__trend--down">-2</span>
+        </div>
+    </div>
+</section>
+
+@code {
+    private SteconAppearanceState _appearance = new(ThemeMode.Light, SteconPalette.Stecon);
+    private bool _modalOpen;
+    private bool _columnSettingsOpen;
+    private IReadOnlyCollection<object> _selected = Array.Empty<object>();
+    private SteconDataTable<ResourceItem>? _tableRef;
+    private SteconTableLayoutState? _tableLayout;
+
+    private SteconTableLayoutState EffectiveTableLayout =>
+        SteconTableLayoutReconciler.Reconcile(_tableLayout, _tableRef?.ColumnDescriptors ?? Array.Empty<SteconColumnDescriptor>());
+
+    private static readonly IReadOnlyList<SteconNavItem> _navSample = new List<SteconNavItem>
+    {
+        new() { Id = "overview", Label = "Overview", Href = "appearance-palette-gallery", Match = NavLinkMatch.All, Icon = IconName.Home },
+        new() { Id = "approvals", Label = "Approvals", Href = "appearance-palette-gallery#approvals", Icon = IconName.ChevronRight },
+        new() { Id = "resources", Label = "ทรัพยากรบุคคล", Href = "appearance-palette-gallery#resources", Icon = IconName.ChevronRight },
+    };
+
+    private static readonly SteconAppearanceSettingsLabels Labels = new(
+        ModeSectionLabel: "Mode",
+        LightLabel: "Light",
+        DarkLabel: "Dark",
+        PaletteSectionLabel: "Palette",
+        SteconPaletteLabel: "STECON",
+        RomanticPaletteLabel: "Romantic",
+        EveningPaletteLabel: "Evening",
+        SunsetPaletteLabel: "Sunset",
+        PurplePaletteLabel: "Purple",
+        PeachPaletteLabel: "Peach",
+        PeacockPaletteLabel: "Peacock",
+        ResetLabel: "Reset appearance");
+
+    private static readonly SteconDataTableSettingsLabels ColumnSettingsLabels = new(
+        ColumnsSectionLabel: "Columns",
+        TableSectionLabel: "Table",
+        VisibleLabel: "Visible",
+        PinNoneLabel: "No pin",
+        PinLeftLabel: "Pin left",
+        PinRightLabel: "Pin right",
+        MoveLeftLabel: "Move left",
+        MoveRightLabel: "Move right",
+        WidenLabel: "Widen",
+        NarrowLabel: "Narrow",
+        ResetColumnLabel: "Reset column",
+        DensityCompactLabel: "Compact",
+        DensityComfortableLabel: "Comfortable",
+        DensitySpaciousLabel: "Spacious",
+        FontSizeSmallLabel: "Small",
+        FontSizeDefaultLabel: "Default",
+        FontSizeLargeLabel: "Large",
+        WrapLabel: "Wrap",
+        NoWrapLabel: "No wrap",
+        ResetAllLabel: "Reset all");
+
+    private Task HandleAppearanceChangedAsync(SteconAppearanceState appearance)
+    {
+        _appearance = appearance;
+        ThemeService.SetTheme(appearance.Mode);
+        ThemeService.SetPalette(appearance.Palette);
+        return Task.CompletedTask;
+    }
+
+    protected override void OnInitialized()
+    {
+        _appearance = new SteconAppearanceState(ThemeService.Current, ThemeService.CurrentPalette);
+        ThemeService.ThemeChanged += OnThemeChanged;
+        ThemeService.PaletteChanged += OnPaletteChanged;
+    }
+
+    private void OnThemeChanged(ThemeMode mode)
+    {
+        _appearance = _appearance with { Mode = mode };
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void OnPaletteChanged(SteconPalette palette)
+    {
+        _appearance = _appearance with { Palette = palette };
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        ThemeService.ThemeChanged -= OnThemeChanged;
+        ThemeService.PaletteChanged -= OnPaletteChanged;
+    }
+}

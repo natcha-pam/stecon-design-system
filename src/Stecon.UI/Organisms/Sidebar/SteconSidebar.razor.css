@@ -58,7 +58,7 @@
 }
 
 .stecon-sidebar__collapse-toggle:focus-visible {
-    outline: 2px solid var(--stecon-status-info);
+    outline: 2px solid var(--stecon-focus-ring);
     outline-offset: 2px;
 }
 
@@ -118,7 +118,7 @@
 .stecon-sidebar--minimal ::deep .stecon-sidebar-item--active > .stecon-sidebar-item__row {
     background-color: transparent;
     border-radius: 0;
-    border-left: 3px solid var(--stecon-status-info);
+    border-left: 3px solid var(--stecon-palette-accent);
 }
 
 .stecon-sidebar--minimal ::deep .stecon-sidebar-group__label {

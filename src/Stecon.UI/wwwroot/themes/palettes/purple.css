@@ -1,0 +1,22 @@
+/*
+  Purple palette (M3) - violet/plum accent, modern, strong selected-state
+  clarity. Direction word derived from a visual reference, not an official
+  STECON brand color - see docs/12-THEME-PALETTE.md.
+*/
+[data-theme='light'][data-palette='purple'] {
+  --stecon-palette-accent: #7c3aed;
+  --stecon-palette-accent-hover: #6d28d9;
+  --stecon-palette-accent-active: #5b21b6;
+  --stecon-palette-accent-soft: #f1e8fd;
+  --stecon-palette-accent-on: #ffffff;
+  --stecon-palette-accent-on-soft: #7c3aed;
+}
+
+[data-theme='dark'][data-palette='purple'] {
+  --stecon-palette-accent: #7c3aed;
+  --stecon-palette-accent-hover: #6d28d9;
+  --stecon-palette-accent-active: #5b21b6;
+  --stecon-palette-accent-soft: #1f1440;
+  --stecon-palette-accent-on: #ffffff;
+  --stecon-palette-accent-on-soft: #c4b5fd;
+}

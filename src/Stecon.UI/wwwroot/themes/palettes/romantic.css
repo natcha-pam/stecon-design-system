@@ -1,0 +1,23 @@
+/*
+  Romantic palette (M3) - rose/pink accent family, warm, enterprise-readable.
+  Direction word derived from a visual reference, not an official STECON brand
+  color - see docs/12-THEME-PALETTE.md. Overrides only the palette-accent
+  tokens; semantic status colors (Success/Warning/Danger/Info) are untouched.
+*/
+[data-theme='light'][data-palette='romantic'] {
+  --stecon-palette-accent: #be185d;
+  --stecon-palette-accent-hover: #9d174d;
+  --stecon-palette-accent-active: #831843;
+  --stecon-palette-accent-soft: #fce7f3;
+  --stecon-palette-accent-on: #ffffff;
+  --stecon-palette-accent-on-soft: #be185d;
+}
+
+[data-theme='dark'][data-palette='romantic'] {
+  --stecon-palette-accent: #be185d;
+  --stecon-palette-accent-hover: #9d174d;
+  --stecon-palette-accent-active: #831843;
+  --stecon-palette-accent-soft: #2a0f1c;
+  --stecon-palette-accent-on: #ffffff;
+  --stecon-palette-accent-on-soft: #f472b6;
+}

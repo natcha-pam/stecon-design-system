@@ -51,13 +51,14 @@
 
     private bool IsDisabled => Disabled || (GroupContext?.Disabled ?? false);
 
+    // A native radio's onchange only ever fires when it becomes the checked one (browsers never
+    // fire onchange for the radio that becomes unchecked), so being invoked at all already means
+    // "select this value" - no need to inspect e.Value. Radios (unlike checkboxes) do not report
+    // a boolean here; casting e.Value to bool throws in a real browser (radio.value defaults to
+    // the string "on"), a defect only ever masked by tests passing a real bool via bUnit's
+    // synthetic Change(true) helper. Found via live browser QA during M3.
     private async Task HandleChange(ChangeEventArgs e)
     {
-        if (!(bool)(e.Value ?? false))
-        {
-            return;
-        }
-
         if (GroupContext is not null)
         {
             await GroupContext.SelectAsync(Value);

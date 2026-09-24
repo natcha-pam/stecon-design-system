@@ -13,3 +13,9 @@
 @import 'tokens/z-index.css';
 @import 'themes/light.css';
 @import 'themes/dark.css';
+@import 'themes/palettes/romantic.css';
+@import 'themes/palettes/evening.css';
+@import 'themes/palettes/sunset.css';
+@import 'themes/palettes/purple.css';
+@import 'themes/palettes/peach.css';
+@import 'themes/palettes/peacock.css';
