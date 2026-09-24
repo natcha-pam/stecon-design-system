@@ -20,6 +20,11 @@
 }
 
 <div class="stecon-data-table-wrapper">
+    @{
+        var renderedColumns = RenderedColumns.ToList();
+        var leftOffsets = ComputeLeftOffsets(renderedColumns);
+        var rightOffsets = ComputeRightOffsets(renderedColumns);
+    }
     <table class="@TableCssClass" style="@TableStyle" aria-label="@AriaLabel" @attributes="SplatAttributes">
         @if (!string.IsNullOrWhiteSpace(Caption))
         {
@@ -30,16 +35,16 @@
             {
                 <col class="stecon-data-table__select-col" />
             }
-            @foreach (var column in VisibleColumns)
+            @foreach (var (column, state) in renderedColumns)
             {
-                <col style="@GetColStyle(column)" />
+                <col style="@GetColStyle(column, state)" />
             }
         </colgroup>
         <thead>
             <tr>
                 @if (SelectionMode == DataTableSelectionMode.Multiple)
                 {
-                    <th scope="col" class="stecon-data-table__select-col">
+                    <th scope="col" class="stecon-data-table__select-col stecon-data-table__select-col--sticky">
                         <SteconCheckbox Value="IsAllCurrentPageSelected" ValueChanged="HandleSelectAllChangedAsync">
                             @if (!string.IsNullOrWhiteSpace(SelectAllLabel))
                             {
@@ -50,12 +55,13 @@
                 }
                 else if (SelectionMode == DataTableSelectionMode.Single)
                 {
-                    <th scope="col" class="stecon-data-table__select-col"></th>
+                    <th scope="col" class="stecon-data-table__select-col stecon-data-table__select-col--sticky"></th>
                 }
-                @foreach (var column in VisibleColumns)
+                @foreach (var (column, state) in renderedColumns)
                 {
                     <th scope="col"
-                        class="@GetHeaderCellClass(column)"
+                        class="@GetHeaderCellClass(column, state)"
+                        style="@GetPinStyle(state, leftOffsets, rightOffsets)"
                         aria-sort="@GetAriaSort(column)">
                         @if (column.Sortable)
                         {
@@ -102,7 +108,7 @@
                     <tr class="@(IsRowSelected(item) ? "stecon-data-table__row--selected" : null)">
                         @if (SelectionMode == DataTableSelectionMode.Multiple)
                         {
-                            <td class="stecon-data-table__select-col">
+                            <td class="stecon-data-table__select-col stecon-data-table__select-col--sticky">
                                 <SteconCheckbox Value="IsRowSelected(item)" ValueChanged="@(isSelected => HandleRowSelectionChangedAsync(item, isSelected))">
                                     <span class="stecon-data-table__visually-hidden">@GetRowAriaLabel(item)</span>
                                 </SteconCheckbox>
@@ -110,7 +116,7 @@
                         }
                         else if (SelectionMode == DataTableSelectionMode.Single)
                         {
-                            <td class="stecon-data-table__select-col">
+                            <td class="stecon-data-table__select-col stecon-data-table__select-col--sticky">
                                 <label class="stecon-data-table__radio-label">
                                     <input type="radio"
                                            class="stecon-data-table__radio"
@@ -121,9 +127,9 @@
                                 </label>
                             </td>
                         }
-                        @foreach (var column in VisibleColumns)
+                        @foreach (var (column, state) in renderedColumns)
                         {
-                            <td class="@GetCellClass(column)">
+                            <td class="@GetCellClass(column, state)" style="@GetPinStyle(state, leftOffsets, rightOffsets)">
                                 @column.CellTemplate!(item)
                             </td>
                         }
@@ -133,6 +139,7 @@
         </tbody>
     </table>
 </div>
+
 
 @code {
     [Parameter, EditorRequired]
@@ -201,25 +208,127 @@
     [Parameter]
     public string? SelectAllLabel { get; set; }
 
+    /// <summary>
+    /// Personalized presentation state (visibility/order/pin/width/density/font/wrap) - controlled,
+    /// read-only from the table's perspective. The table never mutates or pushes this back; all
+    /// personalization edits flow through <see cref="SteconDataTableColumnSettings"/>'s own
+    /// Layout/LayoutChanged, which the consumer binds to the same state. A missing, stale, or
+    /// partially invalid value is tolerated safely - see <see cref="SteconTableLayoutReconciler"/>.
+    /// When null, the table renders using column declaration defaults only (equivalent to M2).
+    /// </summary>
+    [Parameter]
+    public SteconTableLayoutState? Layout { get; set; }
+
+    /// <summary>Simple/uncontrolled table font-size preset. Ignored when <see cref="Layout"/> is supplied - <see cref="Layout"/>'s value wins.</summary>
+    [Parameter]
+    public SteconTableFontSize FontSize { get; set; } = SteconTableFontSize.Default;
+
+    /// <summary>Simple/uncontrolled wrap preference. Ignored when <see cref="Layout"/> is supplied - <see cref="Layout"/>'s value wins.</summary>
+    [Parameter]
+    public SteconTableWrapMode WrapMode { get; set; } = SteconTableWrapMode.Wrap;
+
     [Parameter(CaptureUnmatchedValues = true)]
     public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
 
     private readonly List<SteconDataColumn<TItem>> _columns = new();
     private readonly string _selectionGroupName = $"stecon-datatable-{Guid.NewGuid():N}";
 
-    private IEnumerable<SteconDataColumn<TItem>> VisibleColumns => _columns.Where(c => c.Visible);
+    /// <summary>Width (in px) reserved for the structural selection column - mirrors the <c>.stecon-data-table__select-col</c> CSS width (2.5rem @ 16px root).</summary>
+    private const double SelectionColumnWidthPx = 40;
+
+    /// <summary>Type-erased snapshot of the registered columns' identity/permissions, for reconciliation and for <see cref="SteconDataTableColumnSettings"/> composition.</summary>
+    public IReadOnlyList<SteconColumnDescriptor> ColumnDescriptors => _columns.Select((c, i) => new SteconColumnDescriptor(
+        c.Key,
+        c.Title,
+        c.CanHide,
+        c.CanPin,
+        i,
+        c.Visible,
+        SteconTableLayoutReconciler.TryParsePixels(c.Width, out var widthPx) ? widthPx : null,
+        SteconTableLayoutReconciler.TryParsePixels(c.MinWidth, out var minPx) ? minPx : null,
+        SteconTableLayoutReconciler.TryParsePixels(c.MaxWidth, out var maxPx) ? maxPx : null)).ToList();
+
+    /// <summary>The safe, deterministic layout actually used for rendering - <see cref="Layout"/> reconciled against the currently registered columns.</summary>
+    private SteconTableLayoutState EffectiveLayout => SteconTableLayoutReconciler.Reconcile(Layout, ColumnDescriptors);
+
+    private DataTableDensity EffectiveDensity => Layout?.Density ?? Density;
+
+    private SteconTableFontSize EffectiveFontSize => Layout?.FontSize ?? FontSize;
+
+    private SteconTableWrapMode EffectiveWrapMode => Layout?.WrapMode ?? WrapMode;
+
+    /// <summary>Visible columns paired with their personalized state, in expected visual order: left-pinned, unpinned, right-pinned.</summary>
+    private IEnumerable<(SteconDataColumn<TItem> Column, SteconColumnLayoutState State)> RenderedColumns =>
+        SteconTableLayoutReconciler.VisualOrder(EffectiveLayout)
+            .Where(s => s.Visible)
+            .Select(s => (Column: _columns.FirstOrDefault(c => c.Key == s.Key), State: s))
+            .Where(pair => pair.Column is not null)
+            .Select(pair => (pair.Column!, pair.State));
 
     private bool HasError => !string.IsNullOrWhiteSpace(ErrorMessage) || ErrorContent is not null;
 
-    private int TotalColumnCount => _columns.Count(c => c.Visible) + (SelectionMode == DataTableSelectionMode.None ? 0 : 1);
+    private int TotalColumnCount => RenderedColumns.Count() + (SelectionMode == DataTableSelectionMode.None ? 0 : 1);
 
-    private string DensityClass => Density.ToString().ToLowerInvariant();
+    private string DensityClass => EffectiveDensity.ToString().ToLowerInvariant();
+
+    private string FontSizeClass => EffectiveFontSize.ToString().ToLowerInvariant();
 
     private string TableCssClass => CssClassMerge.Combine(
-        $"stecon-data-table stecon-data-table--{DensityClass}{(StickyHeader ? " stecon-data-table--sticky-header" : string.Empty)}",
+        $"stecon-data-table stecon-data-table--{DensityClass} stecon-data-table--font-{FontSizeClass}" +
+        (StickyHeader ? " stecon-data-table--sticky-header" : string.Empty) +
+        (EffectiveWrapMode == SteconTableWrapMode.NoWrap ? " stecon-data-table--nowrap" : string.Empty),
         AdditionalAttributes);
 
     private string TableStyle => $"table-layout: {(FixedLayout ? "fixed" : "auto")};";
+
+    /// <summary>Cumulative left offset (px) for each left-pinned visible column, in front-to-back order - hidden pinned columns contribute no offset.</summary>
+    private IReadOnlyDictionary<string, double> ComputeLeftOffsets(IReadOnlyList<(SteconDataColumn<TItem> Column, SteconColumnLayoutState State)> renderedColumns)
+    {
+        var offsets = new Dictionary<string, double>();
+        var running = SelectionMode == DataTableSelectionMode.None ? 0d : SelectionColumnWidthPx;
+        foreach (var (column, state) in renderedColumns.Where(rc => rc.State.Pin == SteconColumnPin.Left))
+        {
+            offsets[state.Key] = running;
+            running += SteconTableLayoutReconciler.ResolvePinnedWidthPx(state, GetDescriptor(column));
+        }
+        return offsets;
+    }
+
+    /// <summary>Cumulative right offset (px) for each right-pinned visible column, accumulated from the far right edge inward - hidden pinned columns contribute no offset.</summary>
+    private IReadOnlyDictionary<string, double> ComputeRightOffsets(IReadOnlyList<(SteconDataColumn<TItem> Column, SteconColumnLayoutState State)> renderedColumns)
+    {
+        var offsets = new Dictionary<string, double>();
+        var running = 0d;
+        foreach (var (column, state) in renderedColumns.Where(rc => rc.State.Pin == SteconColumnPin.Right).Reverse())
+        {
+            offsets[state.Key] = running;
+            running += SteconTableLayoutReconciler.ResolvePinnedWidthPx(state, GetDescriptor(column));
+        }
+        return offsets;
+    }
+
+    private SteconColumnDescriptor GetDescriptor(SteconDataColumn<TItem> column) =>
+        ColumnDescriptors.First(d => d.Key == column.Key);
+
+    private static string GetPinStyle(SteconColumnLayoutState state, IReadOnlyDictionary<string, double> leftOffsets, IReadOnlyDictionary<string, double> rightOffsets)
+    {
+        if (state.Pin == SteconColumnPin.Left && leftOffsets.TryGetValue(state.Key, out var left))
+        {
+            return $"left:{left.ToString(System.Globalization.CultureInfo.InvariantCulture)}px";
+        }
+        if (state.Pin == SteconColumnPin.Right && rightOffsets.TryGetValue(state.Key, out var right))
+        {
+            return $"right:{right.ToString(System.Globalization.CultureInfo.InvariantCulture)}px";
+        }
+        return string.Empty;
+    }
+
+    private static string GetPinClass(SteconColumnLayoutState state) => state.Pin switch
+    {
+        SteconColumnPin.Left => "stecon-data-table__pin-left",
+        SteconColumnPin.Right => "stecon-data-table__pin-right",
+        _ => string.Empty,
+    };
 
     private IReadOnlyDictionary<string, object>? SplatAttributes => CssClassMerge.AttributesWithoutClass(AdditionalAttributes);
 
@@ -260,17 +369,26 @@
         }
     };
 
-    private string GetHeaderCellClass(SteconDataColumn<TItem> column) =>
-        string.Join(' ', new[] { $"stecon-data-table__align-{column.Align.ToString().ToLowerInvariant()}", column.HeaderClass }
+    private string GetHeaderCellClass(SteconDataColumn<TItem> column, SteconColumnLayoutState state) =>
+        string.Join(' ', new[] { $"stecon-data-table__align-{column.Align.ToString().ToLowerInvariant()}", GetPinClass(state), column.HeaderClass }
             .Where(c => !string.IsNullOrWhiteSpace(c)));
 
-    private string GetCellClass(SteconDataColumn<TItem> column) =>
-        string.Join(' ', new[] { $"stecon-data-table__align-{column.Align.ToString().ToLowerInvariant()}", column.CellClass }
+    private string GetCellClass(SteconDataColumn<TItem> column, SteconColumnLayoutState state) =>
+        string.Join(' ', new[] { $"stecon-data-table__align-{column.Align.ToString().ToLowerInvariant()}", GetPinClass(state), column.CellClass }
             .Where(c => !string.IsNullOrWhiteSpace(c)));
 
-    private static string GetColStyle(SteconDataColumn<TItem> column)
+    private static string GetColStyle(SteconDataColumn<TItem> column, SteconColumnLayoutState state)
     {
         var parts = new List<string>();
+        if (state.WidthPx is double widthPx)
+        {
+            var px = $"{widthPx.ToString(System.Globalization.CultureInfo.InvariantCulture)}px";
+            parts.Add($"width:{px}");
+            parts.Add($"min-width:{px}");
+            parts.Add($"max-width:{px}");
+            return string.Join(';', parts);
+        }
+
         if (!string.IsNullOrWhiteSpace(column.Width))
         {
             parts.Add($"width:{column.Width}");

@@ -45,6 +45,54 @@
     min-width: 2.5rem;
 }
 
+.stecon-data-table__select-col--sticky {
+    position: sticky;
+    left: 0;
+    z-index: var(--stecon-z-sticky);
+    background-color: inherit;
+}
+
+/* Font size (Foundation typography tokens only - table typography, never global app font size) */
+.stecon-data-table--font-small {
+    font-size: var(--stecon-font-size-xs);
+}
+
+.stecon-data-table--font-default {
+    font-size: var(--stecon-font-size-sm);
+}
+
+.stecon-data-table--font-large {
+    font-size: var(--stecon-font-size-md);
+}
+
+/* Wrap mode - the wrapper's own overflow-x:auto still applies, so NoWrap keeps scrolling internal */
+.stecon-data-table--nowrap th,
+.stecon-data-table--nowrap td {
+    white-space: nowrap;
+}
+
+/* Pinned columns - CSS-only sticky positioning, offsets supplied inline per column via style="left/right:...px" */
+.stecon-data-table__pin-left,
+.stecon-data-table__pin-right {
+    position: sticky;
+    z-index: var(--stecon-z-sticky);
+    background-color: inherit;
+}
+
+.stecon-data-table thead th.stecon-data-table__pin-left,
+.stecon-data-table thead th.stecon-data-table__pin-right {
+    z-index: calc(var(--stecon-z-sticky) + 1);
+}
+
+/* Boundary line separates the pinned group from the scrolling columns - existing border token only, no arbitrary color */
+.stecon-data-table__pin-left + :not(.stecon-data-table__pin-left) {
+    box-shadow: 2px 0 0 0 var(--stecon-border-default) inset;
+}
+
+.stecon-data-table tr > :not(.stecon-data-table__pin-right) + .stecon-data-table__pin-right {
+    box-shadow: -2px 0 0 0 var(--stecon-border-default) inset;
+}
+
 /* Density */
 .stecon-data-table--compact th,
 .stecon-data-table--compact td {

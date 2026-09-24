@@ -42,6 +42,14 @@
     [Parameter]
     public bool Visible { get; set; } = true;
 
+    /// <summary>Whether the user may hide this column via personalization. When <c>false</c>, the column definition always wins - it can never be hidden regardless of saved/personalized state.</summary>
+    [Parameter]
+    public bool CanHide { get; set; } = true;
+
+    /// <summary>Whether the user may pin this column via personalization. When <c>false</c>, the column definition always wins - it can never be pinned regardless of saved/personalized state.</summary>
+    [Parameter]
+    public bool CanPin { get; set; } = true;
+
     [Parameter]
     public string? HeaderClass { get; set; }
 
@@ -51,11 +59,11 @@
     // Snapshot of the parameters that affect the parent table's own markup (excludes
     // HeaderTemplate/CellTemplate, whose delegate identity is not a meaningful change signal
     // and whose content the table already re-invokes fresh on every one of its own renders).
-    private (bool Visible, string? Title, bool Sortable, string? Width, string? MinWidth, string? MaxWidth, DataTableColumnAlign Align, string? HeaderClass, string? CellClass) _lastNotifiedState;
+    private (bool Visible, bool CanHide, bool CanPin, string? Title, bool Sortable, string? Width, string? MinWidth, string? MaxWidth, DataTableColumnAlign Align, string? HeaderClass, string? CellClass) _lastNotifiedState;
     private bool _isRegistered;
 
-    private (bool, string?, bool, string?, string?, string?, DataTableColumnAlign, string?, string?) CurrentState =>
-        (Visible, Title, Sortable, Width, MinWidth, MaxWidth, Align, HeaderClass, CellClass);
+    private (bool, bool, bool, string?, bool, string?, string?, string?, DataTableColumnAlign, string?, string?) CurrentState =>
+        (Visible, CanHide, CanPin, Title, Sortable, Width, MinWidth, MaxWidth, Align, HeaderClass, CellClass);
 
     protected override void OnInitialized()
     {

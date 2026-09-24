@@ -515,4 +515,120 @@ public class SteconDataTableTests : BunitContext
         Assert.Single(hostCut.FindAll("thead th"));
         Assert.Equal("Id", hostCut.FindAll("thead th")[0].TextContent);
     }
+
+    // --- M2B: personalization (Layout) integration ---
+
+    [Fact]
+    public void Layout_PinnedColumn_RendersPinClassAndOffsetStyle()
+    {
+        var descriptors = new[]
+        {
+            new SteconColumnDescriptor("id", "Id", true, true, 0, true, null),
+            new SteconColumnDescriptor("name", "Name", true, true, 1, true, null),
+        };
+        var layout = SteconTableLayoutReconciler.Reconcile(null, descriptors);
+        layout = SteconTableLayoutReconciler.WithColumnPin(layout, "id", SteconColumnPin.Left, descriptors);
+
+        var cut = RenderTable(p => p.Add(x => x.Layout, layout));
+
+        var idHeader = cut.FindAll("thead th").First(h => h.TextContent.Contains("Id"));
+        Assert.Contains("stecon-data-table__pin-left", idHeader.ClassList);
+        Assert.Contains("left:0px", idHeader.GetAttribute("style"));
+    }
+
+    [Fact]
+    public void Layout_RightPinnedColumn_RendersRightOffset()
+    {
+        var descriptors = new[]
+        {
+            new SteconColumnDescriptor("id", "Id", true, true, 0, true, null),
+            new SteconColumnDescriptor("name", "Name", true, true, 1, true, null),
+        };
+        var layout = SteconTableLayoutReconciler.Reconcile(null, descriptors);
+        layout = SteconTableLayoutReconciler.WithColumnPin(layout, "name", SteconColumnPin.Right, descriptors);
+
+        var cut = RenderTable(p => p.Add(x => x.Layout, layout));
+
+        var nameHeader = cut.FindAll("thead th").First(h => h.TextContent.Contains("Name"));
+        Assert.Contains("stecon-data-table__pin-right", nameHeader.ClassList);
+        Assert.Contains("right:0px", nameHeader.GetAttribute("style"));
+    }
+
+    [Fact]
+    public void Layout_HiddenPinnedColumn_CreatesNoOffsetGapForNextPinnedColumn()
+    {
+        var descriptors = new[]
+        {
+            new SteconColumnDescriptor("id", "Id", true, true, 0, true, 100),
+            new SteconColumnDescriptor("name", "Name", true, true, 1, true, 120),
+        };
+        var layout = SteconTableLayoutReconciler.Reconcile(null, descriptors);
+        layout = SteconTableLayoutReconciler.WithColumnPin(layout, "id", SteconColumnPin.Left, descriptors);
+        layout = SteconTableLayoutReconciler.WithColumnPin(layout, "name", SteconColumnPin.Left, descriptors);
+        layout = SteconTableLayoutReconciler.WithColumnVisible(layout, "id", false, descriptors);
+
+        var cut = RenderTable(p => p.Add(x => x.Layout, layout));
+
+        var nameHeader = cut.FindAll("thead th").First(h => h.TextContent.Contains("Name"));
+        Assert.Contains("left:0px", nameHeader.GetAttribute("style")); // "id" is hidden - no gap before "name"
+    }
+
+    [Fact]
+    public void Layout_Null_RendersIdenticallyToM2Default()
+    {
+        var cut = RenderTable();
+
+        Assert.Empty(cut.FindAll(".stecon-data-table__pin-left"));
+        Assert.Empty(cut.FindAll(".stecon-data-table__pin-right"));
+        Assert.Equal(2, cut.FindAll("thead th").Count);
+    }
+
+    [Fact]
+    public void FontSize_TogglesClass()
+    {
+        var cut = RenderTable(p => p.Add(x => x.FontSize, SteconTableFontSize.Large));
+
+        Assert.Contains("stecon-data-table--font-large", cut.Find("table").ClassList);
+    }
+
+    [Fact]
+    public void WrapMode_NoWrap_TogglesClass()
+    {
+        var cut = RenderTable(p => p.Add(x => x.WrapMode, SteconTableWrapMode.NoWrap));
+
+        Assert.Contains("stecon-data-table--nowrap", cut.Find("table").ClassList);
+    }
+
+    [Fact]
+    public void SelectionColumn_IsAlwaysSticky()
+    {
+        var cut = RenderTable(p => p.Add(x => x.SelectionMode, DataTableSelectionMode.Multiple));
+
+        Assert.Contains("stecon-data-table__select-col--sticky", cut.Find("thead th").ClassList);
+    }
+
+    [Fact]
+    public void ColumnDescriptors_ReflectsRegisteredColumns_ForSettingsComposition()
+    {
+        var cut = RenderTable();
+
+        var descriptors = cut.Instance.ColumnDescriptors;
+
+        Assert.Equal(new[] { "id", "name" }, descriptors.Select(d => d.Key));
+    }
+
+    [Fact]
+    public void Layout_ReferencingRemovedColumn_DoesNotCrash()
+    {
+        var staleLayout = new SteconTableLayoutState(new[]
+        {
+            new SteconColumnLayoutState("id"),
+            new SteconColumnLayoutState("removedColumn"),
+            new SteconColumnLayoutState("name"),
+        });
+
+        var exception = Record.Exception(() => RenderTable(p => p.Add(x => x.Layout, staleLayout)));
+
+        Assert.Null(exception);
+    }
 }

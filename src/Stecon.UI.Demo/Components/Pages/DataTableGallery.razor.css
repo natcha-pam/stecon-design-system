@@ -31,3 +31,15 @@
     max-height: 16rem;
     overflow-y: auto;
 }
+
+.stecon-datatable-gallery-json {
+    max-height: 16rem;
+    overflow: auto;
+    padding: var(--stecon-space-3);
+    background-color: var(--stecon-surface-page);
+    border: 1px solid var(--stecon-border-default);
+    border-radius: var(--stecon-radius-sm);
+    font-size: var(--stecon-font-size-xs);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}

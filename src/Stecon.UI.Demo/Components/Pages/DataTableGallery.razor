@@ -229,6 +229,79 @@
     </SteconDataTable>
 </section>
 
+<section class="stecon-datatable-gallery-section">
+    <h2>Advanced Personalization (M2B)</h2>
+    <p>
+        Show/hide, pin left/right/unpin, reorder (Move Left/Right), resize (Widen/Narrow),
+        density, font size, and wrap mode - all presentation-only, never mutating
+        <code>DataTableDemoData.Resources</code> itself. "Job No" cannot be hidden
+        (<code>CanHide="false"</code>); "Remarks" cannot be pinned (<code>CanPin="false"</code>).
+    </p>
+    <div class="stecon-datatable-gallery-toolbar">
+        <SteconButton Variant="ButtonVariant.Secondary" OnClick="@(() => _settingsOpen = true)">Open column settings</SteconButton>
+        <SteconButton Variant="ButtonVariant.Ghost" OnClick="SerializeLayout">Serialize layout to JSON</SteconButton>
+        <SteconButton Variant="ButtonVariant.Ghost" OnClick="RestoreExampleLayout">Restore example (stale) layout</SteconButton>
+    </div>
+
+    <p><strong>Selected (@_personalizationSelected.Count):</strong> @string.Join(", ", _personalizationSelected)</p>
+    <SteconDataTable @ref="_personalizationTableRef" TItem="ResourceItem" Items="_sortedPersonalizationResources"
+                      RowKey="@(i => i.EmployeeId)" Caption="Resources (personalized)"
+                      Layout="_personalizationLayout" StickyHeader="true"
+                      Sort="_personalizationSort" SortChanged="HandlePersonalizationSortChangedAsync"
+                      SelectionMode="DataTableSelectionMode.Multiple" SelectedKeys="_personalizationSelected"
+                      SelectedKeysChanged="HandlePersonalizationSelectedChanged"
+                      RowAriaLabel="@(i => $"Select {i.EmployeeId}")" SelectAllLabel="Select all resources on this page">
+        <Columns>
+            <SteconDataColumn TItem="ResourceItem" Key="jobNo" Title="Job No" Width="90px" CanHide="false">
+                <CellTemplate Context="item">@item.JobNo</CellTemplate>
+            </SteconDataColumn>
+            <SteconDataColumn TItem="ResourceItem" Key="employeeId" Title="Employee ID" Width="110px" Sortable="true">
+                <CellTemplate Context="item">@item.EmployeeId</CellTemplate>
+            </SteconDataColumn>
+            <SteconDataColumn TItem="ResourceItem" Key="nameThai" Title="ชื่อ (ไทย)" Width="180px">
+                <CellTemplate Context="item">@item.NameThai</CellTemplate>
+            </SteconDataColumn>
+            <SteconDataColumn TItem="ResourceItem" Key="nameEnglish" Title="Name (English)" Width="180px">
+                <CellTemplate Context="item">@item.NameEnglish</CellTemplate>
+            </SteconDataColumn>
+            <SteconDataColumn TItem="ResourceItem" Key="position" Title="Position" Width="140px">
+                <CellTemplate Context="item">@item.Position</CellTemplate>
+            </SteconDataColumn>
+            <SteconDataColumn TItem="ResourceItem" Key="department" Title="Department" Width="140px">
+                <CellTemplate Context="item">@item.Department</CellTemplate>
+            </SteconDataColumn>
+            <SteconDataColumn TItem="ResourceItem" Key="jan" Title="Jan" Width="70px" Align="DataTableColumnAlign.End">
+                <CellTemplate Context="item">@item.JanHours</CellTemplate>
+            </SteconDataColumn>
+            <SteconDataColumn TItem="ResourceItem" Key="feb" Title="Feb" Width="70px" Align="DataTableColumnAlign.End">
+                <CellTemplate Context="item">@item.FebHours</CellTemplate>
+            </SteconDataColumn>
+            <SteconDataColumn TItem="ResourceItem" Key="mar" Title="Mar" Width="70px" Align="DataTableColumnAlign.End">
+                <CellTemplate Context="item">@item.MarHours</CellTemplate>
+            </SteconDataColumn>
+            <SteconDataColumn TItem="ResourceItem" Key="remarks" Title="Remarks" MinWidth="18rem" CanPin="false">
+                <CellTemplate Context="item">@item.Remarks</CellTemplate>
+            </SteconDataColumn>
+        </Columns>
+    </SteconDataTable>
+
+    <SteconDrawer @bind-IsOpen="_settingsOpen" Title="Column settings" Placement="DrawerPlacement.Right">
+        @if (_personalizationTableRef is not null)
+        {
+            <SteconDataTableColumnSettings
+                Columns="_personalizationTableRef.ColumnDescriptors"
+                Layout="EffectivePersonalizationLayout"
+                LayoutChanged="HandlePersonalizationLayoutChanged"
+                Labels="PersonalizationLabels" />
+        }
+    </SteconDrawer>
+
+    @if (_serializedLayoutJson is not null)
+    {
+        <pre class="stecon-datatable-gallery-json">@_serializedLayoutJson</pre>
+    }
+</section>
+
 @code {
     private SortState? _approvalSort;
     private string _lastAction = "(none yet)";
@@ -248,6 +321,71 @@
     private bool _showStatusColumn = true;
 
     private DataTableDensity _density = DataTableDensity.Comfortable;
+
+    private SteconDataTable<ResourceItem>? _personalizationTableRef;
+    private SteconTableLayoutState? _personalizationLayout;
+    private bool _settingsOpen;
+    private string? _serializedLayoutJson;
+    private SortState? _personalizationSort;
+    private IReadOnlyCollection<object> _personalizationSelected = Array.Empty<object>();
+
+    private IReadOnlyList<ResourceItem> _sortedPersonalizationResources => _personalizationSort switch
+    {
+        { ColumnKey: "employeeId", Direction: SortDirection.Ascending } => DataTableDemoData.Resources.OrderBy(r => r.EmployeeId).ToList(),
+        { ColumnKey: "employeeId", Direction: SortDirection.Descending } => DataTableDemoData.Resources.OrderByDescending(r => r.EmployeeId).ToList(),
+        _ => DataTableDemoData.Resources,
+    };
+
+    private void HandlePersonalizationSortChangedAsync(SortState? sort) => _personalizationSort = sort;
+
+    private void HandlePersonalizationSelectedChanged(IReadOnlyCollection<object> keys) => _personalizationSelected = keys;
+
+    private static readonly SteconDataTableSettingsLabels PersonalizationLabels = new(
+        ColumnsSectionLabel: "Columns",
+        TableSectionLabel: "Table",
+        VisibleLabel: "Visible",
+        PinNoneLabel: "No pin",
+        PinLeftLabel: "Pin left",
+        PinRightLabel: "Pin right",
+        MoveLeftLabel: "Move left",
+        MoveRightLabel: "Move right",
+        WidenLabel: "Widen",
+        NarrowLabel: "Narrow",
+        ResetColumnLabel: "Reset column",
+        DensityCompactLabel: "Compact",
+        DensityComfortableLabel: "Comfortable",
+        DensitySpaciousLabel: "Spacious",
+        FontSizeSmallLabel: "Small",
+        FontSizeDefaultLabel: "Default",
+        FontSizeLargeLabel: "Large",
+        WrapLabel: "Wrap",
+        NoWrapLabel: "No wrap",
+        ResetAllLabel: "Reset all");
+
+    /// <summary>Always a safe, fully-reconciled state for the Settings panel to display, regardless of what <see cref="_personalizationLayout"/> currently holds (e.g. right after loading the deliberately-stale example).</summary>
+    private SteconTableLayoutState EffectivePersonalizationLayout =>
+        SteconTableLayoutReconciler.Reconcile(_personalizationLayout, _personalizationTableRef?.ColumnDescriptors ?? Array.Empty<SteconColumnDescriptor>());
+
+    private void HandlePersonalizationLayoutChanged(SteconTableLayoutState layout) => _personalizationLayout = layout;
+
+    private void SerializeLayout() => _serializedLayoutJson = System.Text.Json.JsonSerializer.Serialize(
+        EffectivePersonalizationLayout,
+        new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+
+    /// <summary>Demonstrates reconciliation: "retiredColumn" no longer exists (dropped safely); "remarks" is never mentioned (appended with its declared default).</summary>
+    private void RestoreExampleLayout()
+    {
+        var stale = new SteconTableLayoutState(new[]
+        {
+            new SteconColumnLayoutState("jobNo", Pin: SteconColumnPin.Left),
+            new SteconColumnLayoutState("employeeId", Order: 1, Pin: SteconColumnPin.Left, WidthPx: 130),
+            new SteconColumnLayoutState("nameThai", Order: 2),
+            new SteconColumnLayoutState("retiredColumn", Order: 3),
+        }, DataTableDensity.Compact, SteconTableFontSize.Small, SteconTableWrapMode.NoWrap);
+
+        var descriptors = _personalizationTableRef?.ColumnDescriptors ?? Array.Empty<SteconColumnDescriptor>();
+        _personalizationLayout = SteconTableLayoutReconciler.Reconcile(stale, descriptors);
+    }
 
     private IReadOnlyList<ApprovalItem> _repeatedApprovals =
         Enumerable.Range(0, 6).SelectMany(_ => DataTableDemoData.Approvals).ToList();

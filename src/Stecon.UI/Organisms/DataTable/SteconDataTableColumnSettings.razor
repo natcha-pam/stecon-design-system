@@ -1,0 +1,112 @@
+@namespace Stecon.UI
+
+@* Column/table personalization surface, composed entirely from existing STECON atoms/molecules.
+   Consumers place this inside their own SteconDrawer/SteconModal (or inline) - it owns no overlay
+   infrastructure itself, per the existing M1D pattern of not duplicating overlay behavior. *@
+
+<div class="stecon-data-table-settings" @attributes="SplatAttributes">
+    <section class="stecon-data-table-settings__section">
+        <h3 class="stecon-data-table-settings__heading">@Labels.TableSectionLabel</h3>
+        <div class="stecon-data-table-settings__row">
+            <SteconSelect TValue="DataTableDensity" Value="Layout.Density" ValueChanged="HandleDensityChangedAsync">
+                <option value="@DataTableDensity.Compact">@Labels.DensityCompactLabel</option>
+                <option value="@DataTableDensity.Comfortable">@Labels.DensityComfortableLabel</option>
+                <option value="@DataTableDensity.Spacious">@Labels.DensitySpaciousLabel</option>
+            </SteconSelect>
+            <SteconSelect TValue="SteconTableFontSize" Value="Layout.FontSize" ValueChanged="HandleFontSizeChangedAsync">
+                <option value="@SteconTableFontSize.Small">@Labels.FontSizeSmallLabel</option>
+                <option value="@SteconTableFontSize.Default">@Labels.FontSizeDefaultLabel</option>
+                <option value="@SteconTableFontSize.Large">@Labels.FontSizeLargeLabel</option>
+            </SteconSelect>
+            <SteconSelect TValue="SteconTableWrapMode" Value="Layout.WrapMode" ValueChanged="HandleWrapModeChangedAsync">
+                <option value="@SteconTableWrapMode.Wrap">@Labels.WrapLabel</option>
+                <option value="@SteconTableWrapMode.NoWrap">@Labels.NoWrapLabel</option>
+            </SteconSelect>
+            <SteconButton Variant="ButtonVariant.Ghost" Size="ControlSize.Sm" OnClick="HandleResetAllAsync">@Labels.ResetAllLabel</SteconButton>
+        </div>
+    </section>
+
+    <section class="stecon-data-table-settings__section">
+        <h3 class="stecon-data-table-settings__heading">@Labels.ColumnsSectionLabel</h3>
+        <ul class="stecon-data-table-settings__list">
+            @foreach (var column in VisualColumns)
+            {
+                var descriptor = GetDescriptor(column.Key);
+                var key = column.Key;
+                <li class="stecon-data-table-settings__item">
+                    <SteconCheckbox Value="column.Visible" Disabled="!descriptor.CanHide" ValueChanged="@(v => HandleVisibleChangedAsync(key, v))">
+                        @(descriptor.Title ?? descriptor.Key)
+                    </SteconCheckbox>
+                    <SteconSelect TValue="SteconColumnPin" Value="column.Pin" Disabled="!descriptor.CanPin" ValueChanged="@(p => HandlePinChangedAsync(key, p))">
+                        <option value="@SteconColumnPin.None">@Labels.PinNoneLabel</option>
+                        <option value="@SteconColumnPin.Left">@Labels.PinLeftLabel</option>
+                        <option value="@SteconColumnPin.Right">@Labels.PinRightLabel</option>
+                    </SteconSelect>
+                    <SteconButton Size="ControlSize.Sm" Variant="ButtonVariant.Ghost" Disabled="!CanMove(key, -1)" OnClick="@(() => HandleMoveAsync(key, -1))">@Labels.MoveLeftLabel</SteconButton>
+                    <SteconButton Size="ControlSize.Sm" Variant="ButtonVariant.Ghost" Disabled="!CanMove(key, 1)" OnClick="@(() => HandleMoveAsync(key, 1))">@Labels.MoveRightLabel</SteconButton>
+                    <SteconButton Size="ControlSize.Sm" Variant="ButtonVariant.Ghost" OnClick="@(() => HandleResizeAsync(key, -SteconTableLayoutReconciler.ResizeStepPx))">@Labels.NarrowLabel</SteconButton>
+                    <SteconButton Size="ControlSize.Sm" Variant="ButtonVariant.Ghost" OnClick="@(() => HandleResizeAsync(key, SteconTableLayoutReconciler.ResizeStepPx))">@Labels.WidenLabel</SteconButton>
+                    <SteconButton Size="ControlSize.Sm" Variant="ButtonVariant.Ghost" OnClick="@(() => HandleResetColumnAsync(key))">@Labels.ResetColumnLabel</SteconButton>
+                </li>
+            }
+        </ul>
+    </section>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public IReadOnlyList<SteconColumnDescriptor> Columns { get; set; } = Array.Empty<SteconColumnDescriptor>();
+
+    [Parameter, EditorRequired]
+    public SteconTableLayoutState Layout { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public EventCallback<SteconTableLayoutState> LayoutChanged { get; set; }
+
+    [Parameter, EditorRequired]
+    public SteconDataTableSettingsLabels Labels { get; set; } = default!;
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private IReadOnlyDictionary<string, object>? SplatAttributes => CssClassMerge.AttributesWithoutClass(AdditionalAttributes);
+
+    private IReadOnlyList<SteconColumnLayoutState> VisualColumns => SteconTableLayoutReconciler.VisualOrder(Layout);
+
+    private SteconColumnDescriptor GetDescriptor(string key) => Columns.First(d => d.Key == key);
+
+    private bool CanMove(string key, int direction)
+    {
+        var visual = VisualColumns;
+        var index = visual.ToList().FindIndex(c => c.Key == key);
+        var neighborIndex = index + direction;
+        return index >= 0 && neighborIndex >= 0 && neighborIndex < visual.Count && visual[neighborIndex].Pin == visual[index].Pin;
+    }
+
+    private Task HandleVisibleChangedAsync(string key, bool visible) =>
+        LayoutChanged.InvokeAsync(SteconTableLayoutReconciler.WithColumnVisible(Layout, key, visible, Columns));
+
+    private Task HandlePinChangedAsync(string key, SteconColumnPin pin) =>
+        LayoutChanged.InvokeAsync(SteconTableLayoutReconciler.WithColumnPin(Layout, key, pin, Columns));
+
+    private Task HandleMoveAsync(string key, int direction) =>
+        LayoutChanged.InvokeAsync(SteconTableLayoutReconciler.MoveColumn(Layout, key, direction, Columns));
+
+    private Task HandleResizeAsync(string key, double deltaPx) =>
+        LayoutChanged.InvokeAsync(SteconTableLayoutReconciler.ResizeColumn(Layout, key, deltaPx, Columns));
+
+    private Task HandleResetColumnAsync(string key) =>
+        LayoutChanged.InvokeAsync(SteconTableLayoutReconciler.ResetColumn(Layout, key, Columns));
+
+    private Task HandleResetAllAsync() =>
+        LayoutChanged.InvokeAsync(SteconTableLayoutReconciler.ResetAll(Columns));
+
+    private Task HandleDensityChangedAsync(DataTableDensity density) =>
+        LayoutChanged.InvokeAsync(SteconTableLayoutReconciler.WithDensity(Layout, density));
+
+    private Task HandleFontSizeChangedAsync(SteconTableFontSize fontSize) =>
+        LayoutChanged.InvokeAsync(SteconTableLayoutReconciler.WithFontSize(Layout, fontSize));
+
+    private Task HandleWrapModeChangedAsync(SteconTableWrapMode wrapMode) =>
+        LayoutChanged.InvokeAsync(SteconTableLayoutReconciler.WithWrapMode(Layout, wrapMode));
+}
