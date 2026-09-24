@@ -1,0 +1,382 @@
+@namespace Stecon.UI
+@typeparam TItem
+
+<CascadingValue Value="this" IsFixed="true">
+    @Columns
+</CascadingValue>
+
+@if (!string.IsNullOrWhiteSpace(ErrorMessage) || ErrorContent is not null)
+{
+    <div class="stecon-data-table__error">
+        @if (ErrorContent is not null)
+        {
+            @ErrorContent
+        }
+        else
+        {
+            <SteconAlert Variant="AlertVariant.Danger">@ErrorMessage</SteconAlert>
+        }
+    </div>
+}
+
+<div class="stecon-data-table-wrapper">
+    <table class="@TableCssClass" style="@TableStyle" aria-label="@AriaLabel" @attributes="SplatAttributes">
+        @if (!string.IsNullOrWhiteSpace(Caption))
+        {
+            <caption>@Caption</caption>
+        }
+        <colgroup>
+            @if (SelectionMode != DataTableSelectionMode.None)
+            {
+                <col class="stecon-data-table__select-col" />
+            }
+            @foreach (var column in VisibleColumns)
+            {
+                <col style="@GetColStyle(column)" />
+            }
+        </colgroup>
+        <thead>
+            <tr>
+                @if (SelectionMode == DataTableSelectionMode.Multiple)
+                {
+                    <th scope="col" class="stecon-data-table__select-col">
+                        <SteconCheckbox Value="IsAllCurrentPageSelected" ValueChanged="HandleSelectAllChangedAsync">
+                            @if (!string.IsNullOrWhiteSpace(SelectAllLabel))
+                            {
+                                <span class="stecon-data-table__visually-hidden">@SelectAllLabel</span>
+                            }
+                        </SteconCheckbox>
+                    </th>
+                }
+                else if (SelectionMode == DataTableSelectionMode.Single)
+                {
+                    <th scope="col" class="stecon-data-table__select-col"></th>
+                }
+                @foreach (var column in VisibleColumns)
+                {
+                    <th scope="col"
+                        class="@GetHeaderCellClass(column)"
+                        aria-sort="@GetAriaSort(column)">
+                        @if (column.Sortable)
+                        {
+                            <button type="button" class="stecon-data-table__sort-button" @onclick="() => HandleSortClickAsync(column)">
+                                @RenderColumnHeader(column)
+                                <span class="stecon-data-table__sort-icon stecon-data-table__sort-icon--@GetSortStateClass(column)" aria-hidden="true">
+                                    <SteconIcon Name="IconName.ChevronDown" />
+                                </span>
+                            </button>
+                        }
+                        else
+                        {
+                            @RenderColumnHeader(column)
+                        }
+                    </th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @if (IsLoading)
+            {
+                <tr>
+                    <td colspan="@TotalColumnCount" class="stecon-data-table__status-cell">
+                        @(LoadingContent ?? DefaultLoadingContent)
+                    </td>
+                </tr>
+            }
+            else if (HasError)
+            {
+                <!-- error content already rendered above the table; no rows while an error is present -->
+            }
+            else if (Items is null || Items.Count == 0)
+            {
+                <tr>
+                    <td colspan="@TotalColumnCount" class="stecon-data-table__status-cell">
+                        @(EmptyContent ?? DefaultEmptyContent)
+                    </td>
+                </tr>
+            }
+            else
+            {
+                @foreach (var item in Items)
+                {
+                    <tr class="@(IsRowSelected(item) ? "stecon-data-table__row--selected" : null)">
+                        @if (SelectionMode == DataTableSelectionMode.Multiple)
+                        {
+                            <td class="stecon-data-table__select-col">
+                                <SteconCheckbox Value="IsRowSelected(item)" ValueChanged="@(isSelected => HandleRowSelectionChangedAsync(item, isSelected))">
+                                    <span class="stecon-data-table__visually-hidden">@GetRowAriaLabel(item)</span>
+                                </SteconCheckbox>
+                            </td>
+                        }
+                        else if (SelectionMode == DataTableSelectionMode.Single)
+                        {
+                            <td class="stecon-data-table__select-col">
+                                <label class="stecon-data-table__radio-label">
+                                    <input type="radio"
+                                           class="stecon-data-table__radio"
+                                           name="@_selectionGroupName"
+                                           checked="@IsRowSelected(item)"
+                                           @onchange="@(() => HandleRowSelectionChangedAsync(item, true))" />
+                                    <span class="stecon-data-table__visually-hidden">@GetRowAriaLabel(item)</span>
+                                </label>
+                            </td>
+                        }
+                        @foreach (var column in VisibleColumns)
+                        {
+                            <td class="@GetCellClass(column)">
+                                @column.CellTemplate!(item)
+                            </td>
+                        }
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public IReadOnlyList<TItem>? Items { get; set; }
+
+    /// <summary>Stable row identity - never object reference, never row index. Required.</summary>
+    [Parameter, EditorRequired]
+    public Func<TItem, object> RowKey { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public RenderFragment? Columns { get; set; }
+
+    /// <summary>Visible &lt;caption&gt;. Optional - rendering never fails when absent.</summary>
+    [Parameter]
+    public string? Caption { get; set; }
+
+    /// <summary>Explicit accessible name, for when the surrounding page UI already provides visible context.</summary>
+    [Parameter]
+    public string? AriaLabel { get; set; }
+
+    [Parameter]
+    public bool IsLoading { get; set; }
+
+    [Parameter]
+    public RenderFragment? LoadingContent { get; set; }
+
+    [Parameter]
+    public RenderFragment? EmptyContent { get; set; }
+
+    [Parameter]
+    public string? ErrorMessage { get; set; }
+
+    [Parameter]
+    public RenderFragment? ErrorContent { get; set; }
+
+    [Parameter]
+    public bool StickyHeader { get; set; }
+
+    [Parameter]
+    public bool FixedLayout { get; set; }
+
+    [Parameter]
+    public DataTableDensity Density { get; set; } = DataTableDensity.Comfortable;
+
+    [Parameter]
+    public SortState? Sort { get; set; }
+
+    [Parameter]
+    public EventCallback<SortState?> SortChanged { get; set; }
+
+    [Parameter]
+    public DataTableSelectionMode SelectionMode { get; set; } = DataTableSelectionMode.None;
+
+    /// <summary>Keys (from <see cref="RowKey"/>), not items. Controlled - the table never invents cross-page or server-side selection.</summary>
+    [Parameter]
+    public IReadOnlyCollection<object>? SelectedKeys { get; set; }
+
+    [Parameter]
+    public EventCallback<IReadOnlyCollection<object>> SelectedKeysChanged { get; set; }
+
+    /// <summary>Required for meaningful per-row accessible names in selectable tables. No reflection-based fallback guessing - see <see cref="GetRowAriaLabel"/>.</summary>
+    [Parameter]
+    public Func<TItem, string>? RowAriaLabel { get; set; }
+
+    /// <summary>Accessible name for the header "select all" checkbox. Required for a meaningful accessible name whenever <see cref="SelectionMode"/> is <see cref="DataTableSelectionMode.Multiple"/> - no English/Thai fallback text is invented here, keeping the library language-neutral. Selects only the current rendered page - never all server-side results.</summary>
+    [Parameter]
+    public string? SelectAllLabel { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private readonly List<SteconDataColumn<TItem>> _columns = new();
+    private readonly string _selectionGroupName = $"stecon-datatable-{Guid.NewGuid():N}";
+
+    private IEnumerable<SteconDataColumn<TItem>> VisibleColumns => _columns.Where(c => c.Visible);
+
+    private bool HasError => !string.IsNullOrWhiteSpace(ErrorMessage) || ErrorContent is not null;
+
+    private int TotalColumnCount => _columns.Count(c => c.Visible) + (SelectionMode == DataTableSelectionMode.None ? 0 : 1);
+
+    private string DensityClass => Density.ToString().ToLowerInvariant();
+
+    private string TableCssClass => CssClassMerge.Combine(
+        $"stecon-data-table stecon-data-table--{DensityClass}{(StickyHeader ? " stecon-data-table--sticky-header" : string.Empty)}",
+        AdditionalAttributes);
+
+    private string TableStyle => $"table-layout: {(FixedLayout ? "fixed" : "auto")};";
+
+    private IReadOnlyDictionary<string, object>? SplatAttributes => CssClassMerge.AttributesWithoutClass(AdditionalAttributes);
+
+    private static RenderFragment DefaultLoadingContent => builder => builder.AddContent(0, "Loading...");
+
+    private static RenderFragment DefaultEmptyContent => builder => builder.AddContent(0, "No data.");
+
+    internal void AddColumn(SteconDataColumn<TItem> column)
+    {
+        if (_columns.Any(c => c.Key == column.Key))
+        {
+            throw new InvalidOperationException(
+                $"Duplicate {nameof(SteconDataColumn<TItem>)} key '{column.Key}'. Column keys must be unique within a {nameof(SteconDataTable<TItem>)}.");
+        }
+
+        _columns.Add(column);
+        StateHasChanged();
+    }
+
+    internal void RemoveColumn(SteconDataColumn<TItem> column)
+    {
+        _columns.Remove(column);
+        StateHasChanged();
+    }
+
+    /// <summary>Called by a registered <see cref="SteconDataColumn{TItem}"/> when one of its render-affecting parameters (e.g. <c>Visible</c>) actually changed, so the table re-renders with the new value in the same logical update instead of one render behind.</summary>
+    internal void NotifyColumnChanged() => StateHasChanged();
+
+    private RenderFragment RenderColumnHeader(SteconDataColumn<TItem> column) => builder =>
+    {
+        if (column.HeaderTemplate is not null)
+        {
+            builder.AddContent(0, column.HeaderTemplate);
+        }
+        else
+        {
+            builder.AddContent(1, column.Title);
+        }
+    };
+
+    private string GetHeaderCellClass(SteconDataColumn<TItem> column) =>
+        string.Join(' ', new[] { $"stecon-data-table__align-{column.Align.ToString().ToLowerInvariant()}", column.HeaderClass }
+            .Where(c => !string.IsNullOrWhiteSpace(c)));
+
+    private string GetCellClass(SteconDataColumn<TItem> column) =>
+        string.Join(' ', new[] { $"stecon-data-table__align-{column.Align.ToString().ToLowerInvariant()}", column.CellClass }
+            .Where(c => !string.IsNullOrWhiteSpace(c)));
+
+    private static string GetColStyle(SteconDataColumn<TItem> column)
+    {
+        var parts = new List<string>();
+        if (!string.IsNullOrWhiteSpace(column.Width))
+        {
+            parts.Add($"width:{column.Width}");
+        }
+        if (!string.IsNullOrWhiteSpace(column.MinWidth))
+        {
+            parts.Add($"min-width:{column.MinWidth}");
+        }
+        if (!string.IsNullOrWhiteSpace(column.MaxWidth))
+        {
+            parts.Add($"max-width:{column.MaxWidth}");
+        }
+        return string.Join(';', parts);
+    }
+
+    private string? GetAriaSort(SteconDataColumn<TItem> column)
+    {
+        if (!column.Sortable)
+        {
+            return null;
+        }
+        if (Sort is null || Sort.ColumnKey != column.Key)
+        {
+            return "none";
+        }
+        return Sort.Direction switch
+        {
+            SortDirection.Ascending => "ascending",
+            SortDirection.Descending => "descending",
+            _ => "none",
+        };
+    }
+
+    private string GetSortStateClass(SteconDataColumn<TItem> column) => GetAriaSort(column) ?? "none";
+
+    private async Task HandleSortClickAsync(SteconDataColumn<TItem> column)
+    {
+        if (!column.Sortable)
+        {
+            return;
+        }
+
+        var currentDirection = Sort is not null && Sort.ColumnKey == column.Key ? Sort.Direction : SortDirection.None;
+        var nextDirection = currentDirection switch
+        {
+            SortDirection.None => SortDirection.Ascending,
+            SortDirection.Ascending => SortDirection.Descending,
+            _ => SortDirection.None,
+        };
+
+        var newSort = nextDirection == SortDirection.None ? null : new SortState(column.Key, nextDirection);
+        await SortChanged.InvokeAsync(newSort);
+    }
+
+    private bool IsRowSelected(TItem item) => SelectedKeys?.Contains(RowKey(item)) ?? false;
+
+    private bool IsAllCurrentPageSelected => Items is { Count: > 0 } && Items.All(IsRowSelected);
+
+    private string GetRowAriaLabel(TItem item) => RowAriaLabel?.Invoke(item) ?? $"Select {RowKey(item)}";
+
+    private async Task HandleRowSelectionChangedAsync(TItem item, bool isSelected)
+    {
+        var key = RowKey(item);
+        var current = SelectedKeys?.ToList() ?? new List<object>();
+
+        if (SelectionMode == DataTableSelectionMode.Single)
+        {
+            current = isSelected ? new List<object> { key } : new List<object>();
+        }
+        else
+        {
+            if (isSelected && !current.Contains(key))
+            {
+                current.Add(key);
+            }
+            else if (!isSelected)
+            {
+                current.Remove(key);
+            }
+        }
+
+        await SelectedKeysChanged.InvokeAsync(current);
+    }
+
+    private async Task HandleSelectAllChangedAsync(bool selectAll)
+    {
+        if (Items is null)
+        {
+            return;
+        }
+
+        var current = SelectedKeys?.ToList() ?? new List<object>();
+
+        foreach (var item in Items)
+        {
+            var key = RowKey(item);
+            if (selectAll && !current.Contains(key))
+            {
+                current.Add(key);
+            }
+            else if (!selectAll)
+            {
+                current.Remove(key);
+            }
+        }
+
+        await SelectedKeysChanged.InvokeAsync(current);
+    }
+}

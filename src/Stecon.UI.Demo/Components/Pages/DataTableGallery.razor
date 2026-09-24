@@ -1,0 +1,317 @@
+@page "/data-table-gallery"
+@inject IThemeService ThemeService
+@implements IDisposable
+
+<PageTitle>DataTable Gallery</PageTitle>
+
+<h1>DataTable Gallery</h1>
+<p>
+    Verify SteconDataTable, SteconDataColumn, and SteconPaginator across states and
+    themes. Resize the browser to <strong>375px</strong>, <strong>768px</strong>, and
+    <strong>1440px</strong>, and toggle the theme below to verify Light/Dark. All data
+    on this page is fake/demo data.
+</p>
+
+<div class="stecon-datatable-gallery-toolbar">
+    <SteconButton Variant="ButtonVariant.Secondary" OnClick="ToggleTheme">
+        Theme: @ThemeService.Current
+    </SteconButton>
+</div>
+
+<section class="stecon-datatable-gallery-section">
+    <h2>Basic, Sortable, Status Badges, Row Actions</h2>
+    <SteconDataTable TItem="ApprovalItem" Items="_sortedApprovals" RowKey="@(i => i.RequestNo)"
+                      Caption="Pending approvals" Sort="_approvalSort" SortChanged="HandleApprovalSortChangedAsync">
+        <Columns>
+            <SteconDataColumn TItem="ApprovalItem" Key="requestNo" Title="Request #" Sortable="true">
+                <CellTemplate Context="item">@item.RequestNo</CellTemplate>
+            </SteconDataColumn>
+            <SteconDataColumn TItem="ApprovalItem" Key="requester" Title="Requester" Sortable="true">
+                <CellTemplate Context="item">@item.Requester</CellTemplate>
+            </SteconDataColumn>
+            <SteconDataColumn TItem="ApprovalItem" Key="project" Title="Project">
+                <CellTemplate Context="item">@item.Project</CellTemplate>
+            </SteconDataColumn>
+            <SteconDataColumn TItem="ApprovalItem" Key="submitted" Title="Submitted" Sortable="true">
+                <CellTemplate Context="item">@item.Submitted.ToString("yyyy-MM-dd")</CellTemplate>
+            </SteconDataColumn>
+            <SteconDataColumn TItem="ApprovalItem" Key="status" Title="Status">
+                <CellTemplate Context="item">
+                    <SteconBadge Variant="GetStatusVariant(item.Status)">@item.Status</SteconBadge>
+                </CellTemplate>
+            </SteconDataColumn>
+            <SteconDataColumn TItem="ApprovalItem" Key="actions" Title="Actions">
+                <CellTemplate Context="item">
+                    <div class="stecon-datatable-gallery-row-actions">
+                        <SteconButton Size="ControlSize.Sm" Variant="ButtonVariant.Primary" OnClick="@(() => HandleApprove(item))">Approve</SteconButton>
+                        <SteconButton Size="ControlSize.Sm" Variant="ButtonVariant.Danger" OnClick="@(() => HandleReject(item))">Reject</SteconButton>
+                    </div>
+                </CellTemplate>
+            </SteconDataColumn>
+        </Columns>
+    </SteconDataTable>
+    <p>Last action: @_lastAction</p>
+</section>
+
+<section class="stecon-datatable-gallery-section">
+    <h2>Selection</h2>
+    <h3>Single selection</h3>
+    <SteconDataTable TItem="ApprovalItem" Items="DataTableDemoData.Approvals" RowKey="@(i => i.RequestNo)"
+                      SelectionMode="DataTableSelectionMode.Single"
+                      SelectedKeys="_singleSelected" SelectedKeysChanged="HandleSingleSelectedChanged"
+                      RowAriaLabel="@(i => $"Select request {i.RequestNo}")">
+        <Columns>
+            <SteconDataColumn TItem="ApprovalItem" Key="requestNo" Title="Request #">
+                <CellTemplate Context="item">@item.RequestNo</CellTemplate>
+            </SteconDataColumn>
+            <SteconDataColumn TItem="ApprovalItem" Key="requester" Title="Requester">
+                <CellTemplate Context="item">@item.Requester</CellTemplate>
+            </SteconDataColumn>
+        </Columns>
+    </SteconDataTable>
+    <p>Selected: @string.Join(", ", _singleSelected)</p>
+
+    <h3>Multiple selection (Select All = current page only)</h3>
+    <p>
+        <strong>Select All only selects the rows currently rendered on this page</strong> -
+        it never selects records elsewhere on the server. Try paginating below after
+        selecting - the selection is not preserved across a full server re-fetch in this demo.
+    </p>
+    <SteconDataTable TItem="ApprovalItem" Items="DataTableDemoData.Approvals" RowKey="@(i => i.RequestNo)"
+                      SelectionMode="DataTableSelectionMode.Multiple"
+                      SelectedKeys="_multiSelected" SelectedKeysChanged="HandleMultiSelectedChanged"
+                      RowAriaLabel="@(i => $"Select request {i.RequestNo}")"
+                      SelectAllLabel="Select all requests on this page">
+        <Columns>
+            <SteconDataColumn TItem="ApprovalItem" Key="requestNo" Title="Request #">
+                <CellTemplate Context="item">@item.RequestNo</CellTemplate>
+            </SteconDataColumn>
+            <SteconDataColumn TItem="ApprovalItem" Key="requester" Title="Requester">
+                <CellTemplate Context="item">@item.Requester</CellTemplate>
+            </SteconDataColumn>
+        </Columns>
+    </SteconDataTable>
+    <p>Selected (@_multiSelected.Count): @string.Join(", ", _multiSelected)</p>
+</section>
+
+<section class="stecon-datatable-gallery-section">
+    <h2>Pagination - server-driven simulation</h2>
+    <p>Data is re-fetched (simulated network delay) every time the page or page size changes - only the current page is ever held in memory.</p>
+    <SteconDataTable TItem="ApprovalItem" Items="_serverPageItems" RowKey="@(i => i.RequestNo)"
+                      IsLoading="_serverLoading" Caption="All requests (server-paged)">
+        <Columns>
+            <SteconDataColumn TItem="ApprovalItem" Key="requestNo" Title="Request #">
+                <CellTemplate Context="item">@item.RequestNo</CellTemplate>
+            </SteconDataColumn>
+            <SteconDataColumn TItem="ApprovalItem" Key="requester" Title="Requester">
+                <CellTemplate Context="item">@item.Requester</CellTemplate>
+            </SteconDataColumn>
+            <SteconDataColumn TItem="ApprovalItem" Key="project" Title="Project">
+                <CellTemplate Context="item">@item.Project</CellTemplate>
+            </SteconDataColumn>
+        </Columns>
+    </SteconDataTable>
+    <SteconPaginator Page="_serverPage" PageChanged="HandleServerPageChangedAsync"
+                      PageSize="_serverPageSize" PageSizeOptions="@(new[] { 5, 10, 20 })"
+                      PageSizeChanged="HandleServerPageSizeChangedAsync"
+                      TotalCount="_serverTotalCount"
+                      PreviousLabel="Previous" NextLabel="Next" PageSizeLabel="Rows per page"
+                      FormatStatus="@((page, total) => $"Page {page} of {total}")" />
+</section>
+
+<section class="stecon-datatable-gallery-section">
+    <h2>Loading / Empty / Error states</h2>
+    <div class="stecon-datatable-gallery-row-actions">
+        <SteconButton Size="ControlSize.Sm" OnClick="@(() => _demoState = "loading")">Show loading</SteconButton>
+        <SteconButton Size="ControlSize.Sm" OnClick="@(() => _demoState = "empty")">Show empty</SteconButton>
+        <SteconButton Size="ControlSize.Sm" OnClick="@(() => _demoState = "error")">Show error</SteconButton>
+        <SteconButton Size="ControlSize.Sm" OnClick="@(() => _demoState = "data")">Show data</SteconButton>
+    </div>
+    <SteconDataTable TItem="ApprovalItem"
+                      Items="@(_demoState == "empty" ? Array.Empty<ApprovalItem>() : DataTableDemoData.Approvals)"
+                      RowKey="@(i => i.RequestNo)"
+                      IsLoading="@(_demoState == "loading")"
+                      ErrorMessage="@(_demoState == "error" ? "Failed to load approvals. Please try again." : null)">
+        <Columns>
+            <SteconDataColumn TItem="ApprovalItem" Key="requestNo" Title="Request #">
+                <CellTemplate Context="item">@item.RequestNo</CellTemplate>
+            </SteconDataColumn>
+            <SteconDataColumn TItem="ApprovalItem" Key="requester" Title="Requester">
+                <CellTemplate Context="item">@item.Requester</CellTemplate>
+            </SteconDataColumn>
+        </Columns>
+    </SteconDataTable>
+</section>
+
+<section class="stecon-datatable-gallery-section">
+    <h2>Column visibility</h2>
+    <div class="stecon-datatable-gallery-row-actions">
+        <SteconCheckbox @bind-Value="_showProjectColumn">Show Project column</SteconCheckbox>
+        <SteconCheckbox @bind-Value="_showStatusColumn">Show Status column</SteconCheckbox>
+    </div>
+    <SteconDataTable TItem="ApprovalItem" Items="DataTableDemoData.Approvals" RowKey="@(i => i.RequestNo)">
+        <Columns>
+            <SteconDataColumn TItem="ApprovalItem" Key="requestNo" Title="Request #">
+                <CellTemplate Context="item">@item.RequestNo</CellTemplate>
+            </SteconDataColumn>
+            <SteconDataColumn TItem="ApprovalItem" Key="project" Title="Project" Visible="_showProjectColumn">
+                <CellTemplate Context="item">@item.Project</CellTemplate>
+            </SteconDataColumn>
+            <SteconDataColumn TItem="ApprovalItem" Key="status" Title="Status" Visible="_showStatusColumn">
+                <CellTemplate Context="item">
+                    <SteconBadge Variant="GetStatusVariant(item.Status)">@item.Status</SteconBadge>
+                </CellTemplate>
+            </SteconDataColumn>
+        </Columns>
+    </SteconDataTable>
+</section>
+
+<section class="stecon-datatable-gallery-section">
+    <h2>Sticky header &amp; Density</h2>
+    <div class="stecon-datatable-gallery-row-actions">
+        <SteconButton Size="ControlSize.Sm" Variant="@(_density == DataTableDensity.Compact ? ButtonVariant.Primary : ButtonVariant.Secondary)" OnClick="@(() => _density = DataTableDensity.Compact)">Compact</SteconButton>
+        <SteconButton Size="ControlSize.Sm" Variant="@(_density == DataTableDensity.Comfortable ? ButtonVariant.Primary : ButtonVariant.Secondary)" OnClick="@(() => _density = DataTableDensity.Comfortable)">Comfortable</SteconButton>
+        <SteconButton Size="ControlSize.Sm" Variant="@(_density == DataTableDensity.Spacious ? ButtonVariant.Primary : ButtonVariant.Secondary)" OnClick="@(() => _density = DataTableDensity.Spacious)">Spacious</SteconButton>
+    </div>
+    <div class="stecon-datatable-gallery-scroll-container">
+        <SteconDataTable TItem="ApprovalItem" Items="_repeatedApprovals" RowKey="@(i => i.RequestNo + i.Submitted.ToString())"
+                          StickyHeader="true" Density="_density">
+            <Columns>
+                <SteconDataColumn TItem="ApprovalItem" Key="requestNo" Title="Request #">
+                    <CellTemplate Context="item">@item.RequestNo</CellTemplate>
+                </SteconDataColumn>
+                <SteconDataColumn TItem="ApprovalItem" Key="requester" Title="Requester">
+                    <CellTemplate Context="item">@item.Requester</CellTemplate>
+                </SteconDataColumn>
+                <SteconDataColumn TItem="ApprovalItem" Key="project" Title="Project">
+                    <CellTemplate Context="item">@item.Project</CellTemplate>
+                </SteconDataColumn>
+            </Columns>
+        </SteconDataTable>
+    </div>
+</section>
+
+<section class="stecon-datatable-gallery-section">
+    <h2>Resource Management (many columns, Thai/English, horizontal scroll)</h2>
+    <SteconDataTable TItem="ResourceItem" Items="DataTableDemoData.Resources" RowKey="@(i => i.EmployeeId)" FixedLayout="true">
+        <Columns>
+            <SteconDataColumn TItem="ResourceItem" Key="jobNo" Title="Job No" Width="8rem">
+                <CellTemplate Context="item">@item.JobNo</CellTemplate>
+            </SteconDataColumn>
+            <SteconDataColumn TItem="ResourceItem" Key="employeeId" Title="Employee ID" Width="8rem">
+                <CellTemplate Context="item">@item.EmployeeId</CellTemplate>
+            </SteconDataColumn>
+            <SteconDataColumn TItem="ResourceItem" Key="nameThai" Title="ชื่อ (ไทย)" Width="14rem">
+                <CellTemplate Context="item">@item.NameThai</CellTemplate>
+            </SteconDataColumn>
+            <SteconDataColumn TItem="ResourceItem" Key="nameEnglish" Title="Name (English)" Width="14rem">
+                <CellTemplate Context="item">@item.NameEnglish</CellTemplate>
+            </SteconDataColumn>
+            <SteconDataColumn TItem="ResourceItem" Key="position" Title="Position" Width="10rem">
+                <CellTemplate Context="item">@item.Position</CellTemplate>
+            </SteconDataColumn>
+            <SteconDataColumn TItem="ResourceItem" Key="department" Title="Department" Width="10rem">
+                <CellTemplate Context="item">@item.Department</CellTemplate>
+            </SteconDataColumn>
+            <SteconDataColumn TItem="ResourceItem" Key="jan" Title="Jan" Width="5rem" Align="DataTableColumnAlign.End">
+                <CellTemplate Context="item">@item.JanHours</CellTemplate>
+            </SteconDataColumn>
+            <SteconDataColumn TItem="ResourceItem" Key="feb" Title="Feb" Width="5rem" Align="DataTableColumnAlign.End">
+                <CellTemplate Context="item">@item.FebHours</CellTemplate>
+            </SteconDataColumn>
+            <SteconDataColumn TItem="ResourceItem" Key="mar" Title="Mar" Width="5rem" Align="DataTableColumnAlign.End">
+                <CellTemplate Context="item">@item.MarHours</CellTemplate>
+            </SteconDataColumn>
+            <SteconDataColumn TItem="ResourceItem" Key="remarks" Title="Remarks" MinWidth="18rem">
+                <CellTemplate Context="item">@item.Remarks</CellTemplate>
+            </SteconDataColumn>
+        </Columns>
+    </SteconDataTable>
+</section>
+
+@code {
+    private SortState? _approvalSort;
+    private string _lastAction = "(none yet)";
+
+    private IReadOnlyCollection<object> _singleSelected = Array.Empty<object>();
+    private IReadOnlyCollection<object> _multiSelected = Array.Empty<object>();
+
+    private int _serverPage = 1;
+    private int _serverPageSize = 10;
+    private int _serverTotalCount;
+    private IReadOnlyList<ApprovalItem> _serverPageItems = Array.Empty<ApprovalItem>();
+    private bool _serverLoading;
+
+    private string _demoState = "data";
+
+    private bool _showProjectColumn = true;
+    private bool _showStatusColumn = true;
+
+    private DataTableDensity _density = DataTableDensity.Comfortable;
+
+    private IReadOnlyList<ApprovalItem> _repeatedApprovals =
+        Enumerable.Range(0, 6).SelectMany(_ => DataTableDemoData.Approvals).ToList();
+
+    private IReadOnlyList<ApprovalItem> _sortedApprovals => _approvalSort switch
+    {
+        { ColumnKey: "requestNo", Direction: SortDirection.Ascending } => DataTableDemoData.Approvals.OrderBy(a => a.RequestNo).ToList(),
+        { ColumnKey: "requestNo", Direction: SortDirection.Descending } => DataTableDemoData.Approvals.OrderByDescending(a => a.RequestNo).ToList(),
+        { ColumnKey: "requester", Direction: SortDirection.Ascending } => DataTableDemoData.Approvals.OrderBy(a => a.Requester).ToList(),
+        { ColumnKey: "requester", Direction: SortDirection.Descending } => DataTableDemoData.Approvals.OrderByDescending(a => a.Requester).ToList(),
+        { ColumnKey: "submitted", Direction: SortDirection.Ascending } => DataTableDemoData.Approvals.OrderBy(a => a.Submitted).ToList(),
+        { ColumnKey: "submitted", Direction: SortDirection.Descending } => DataTableDemoData.Approvals.OrderByDescending(a => a.Submitted).ToList(),
+        _ => DataTableDemoData.Approvals,
+    };
+
+    private static BadgeVariant GetStatusVariant(string status) => status switch
+    {
+        "Approved" => BadgeVariant.Success,
+        "Rejected" => BadgeVariant.Danger,
+        _ => BadgeVariant.Warning,
+    };
+
+    private void HandleApprovalSortChangedAsync(SortState? sort) => _approvalSort = sort;
+
+    private void HandleApprove(ApprovalItem item) => _lastAction = $"Approved {item.RequestNo}";
+
+    private void HandleReject(ApprovalItem item) => _lastAction = $"Rejected {item.RequestNo}";
+
+    private void HandleSingleSelectedChanged(IReadOnlyCollection<object> keys) => _singleSelected = keys;
+
+    private void HandleMultiSelectedChanged(IReadOnlyCollection<object> keys) => _multiSelected = keys;
+
+    private async Task HandleServerPageChangedAsync(int page)
+    {
+        _serverPage = page;
+        await LoadServerPageAsync();
+    }
+
+    private async Task HandleServerPageSizeChangedAsync(int pageSize)
+    {
+        _serverPageSize = pageSize;
+        await LoadServerPageAsync();
+    }
+
+    private async Task LoadServerPageAsync()
+    {
+        _serverLoading = true;
+        StateHasChanged();
+        await Task.Delay(400);
+        _serverPageItems = DataTableDemoData.GenerateServerPage(_serverPage, _serverPageSize, out var total);
+        _serverTotalCount = total;
+        _serverLoading = false;
+    }
+
+    private void ToggleTheme() =>
+        ThemeService.SetTheme(ThemeService.Current == ThemeMode.Light ? ThemeMode.Dark : ThemeMode.Light);
+
+    protected override async Task OnInitializedAsync()
+    {
+        ThemeService.ThemeChanged += OnThemeChanged;
+        await LoadServerPageAsync();
+    }
+
+    private void OnThemeChanged(ThemeMode mode) => InvokeAsync(StateHasChanged);
+
+    public void Dispose() => ThemeService.ThemeChanged -= OnThemeChanged;
+}

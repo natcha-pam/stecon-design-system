@@ -1,0 +1,33 @@
+/*
+  Gallery-only playground styling - not part of the Stecon.UI public
+  component API.
+*/
+
+.stecon-datatable-gallery-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: var(--stecon-space-4);
+}
+
+.stecon-datatable-gallery-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--stecon-space-3);
+    padding: var(--stecon-space-4);
+    margin-bottom: var(--stecon-space-6);
+    background-color: var(--stecon-surface-card);
+    border: 1px solid var(--stecon-border-default);
+    border-radius: var(--stecon-radius-md);
+    min-width: 0;
+}
+
+.stecon-datatable-gallery-row-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--stecon-space-2);
+}
+
+.stecon-datatable-gallery-scroll-container {
+    max-height: 16rem;
+    overflow-y: auto;
+}

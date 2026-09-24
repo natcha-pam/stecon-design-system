@@ -1,0 +1,87 @@
+@namespace Stecon.UI
+
+<nav class="@CssClass" @attributes="SplatAttributes">
+    <SteconButton Variant="ButtonVariant.Secondary" Size="ControlSize.Sm" Disabled="!HasPrevious" OnClick="HandlePreviousAsync">
+        @PreviousLabel
+    </SteconButton>
+
+    <span class="stecon-paginator__status">@StatusText</span>
+
+    <SteconButton Variant="ButtonVariant.Secondary" Size="ControlSize.Sm" Disabled="!HasNext" OnClick="HandleNextAsync">
+        @NextLabel
+    </SteconButton>
+
+    @if (PageSizeOptions is { Count: > 0 })
+    {
+        <label class="stecon-paginator__page-size">
+            <span>@PageSizeLabel</span>
+            <SteconSelect TValue="int" Value="PageSize" ValueChanged="HandlePageSizeChangedAsync" Size="ControlSize.Sm">
+                @foreach (var option in PageSizeOptions)
+                {
+                    <option value="@option">@option</option>
+                }
+            </SteconSelect>
+        </label>
+    }
+</nav>
+
+@code {
+    [Parameter, EditorRequired]
+    public int Page { get; set; } = 1;
+
+    [Parameter]
+    public EventCallback<int> PageChanged { get; set; }
+
+    [Parameter]
+    public int PageSize { get; set; } = 25;
+
+    [Parameter]
+    public EventCallback<int> PageSizeChanged { get; set; }
+
+    /// <summary>Null means unknown/not yet reported by the server - Prev/Next remain usable, no page-number list is shown.</summary>
+    [Parameter]
+    public int? TotalCount { get; set; }
+
+    /// <summary>Null omits the page-size selector entirely.</summary>
+    [Parameter]
+    public IReadOnlyList<int>? PageSizeOptions { get; set; }
+
+    [Parameter, EditorRequired]
+    public string PreviousLabel { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public string NextLabel { get; set; } = default!;
+
+    /// <summary>Required only when <see cref="PageSizeOptions"/> is supplied.</summary>
+    [Parameter]
+    public string? PageSizeLabel { get; set; }
+
+    /// <summary>Formats the status text from (page, totalPages). Keeps the library language-neutral - default shows just the page number.</summary>
+    [Parameter]
+    public Func<int, int?, string>? FormatStatus { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private int? TotalPages => TotalCount is { } total ? Math.Max(1, (int)Math.Ceiling(total / (double)PageSize)) : null;
+
+    private bool HasPrevious => Page > 1;
+
+    private bool HasNext => TotalPages is { } total ? Page < total : true;
+
+    private string StatusText => FormatStatus?.Invoke(Page, TotalPages) ?? Page.ToString();
+
+    private string CssClass => CssClassMerge.Combine("stecon-paginator", AdditionalAttributes);
+
+    private IReadOnlyDictionary<string, object>? SplatAttributes => CssClassMerge.AttributesWithoutClass(AdditionalAttributes);
+
+    private Task HandlePreviousAsync() => HasPrevious ? PageChanged.InvokeAsync(Page - 1) : Task.CompletedTask;
+
+    private Task HandleNextAsync() => HasNext ? PageChanged.InvokeAsync(Page + 1) : Task.CompletedTask;
+
+    private async Task HandlePageSizeChangedAsync(int newPageSize)
+    {
+        await PageSizeChanged.InvokeAsync(newPageSize);
+        await PageChanged.InvokeAsync(1);
+    }
+}

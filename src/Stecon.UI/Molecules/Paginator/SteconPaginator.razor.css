@@ -1,0 +1,24 @@
+.stecon-paginator {
+    box-sizing: border-box;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--stecon-space-3);
+    padding: var(--stecon-space-2) 0;
+    color: var(--stecon-text-primary);
+    font-size: var(--stecon-font-size-sm);
+}
+
+.stecon-paginator__status {
+    min-width: 2ch;
+    text-align: center;
+    color: var(--stecon-text-secondary);
+}
+
+.stecon-paginator__page-size {
+    display: flex;
+    align-items: center;
+    gap: var(--stecon-space-2);
+    margin-left: auto;
+    color: var(--stecon-text-secondary);
+}
